@@ -1,0 +1,36 @@
+{
+  description = "NixOS configuration for the homeserver";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs =
+    inputs@{ nixpkgs, disko, ... }:
+    let
+      system = "x86_64-linux";
+    in
+    {
+      nixosConfigurations.homeserver = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = { inherit inputs; };
+        modules = [
+          disko.nixosModules.disko
+          ./hosts/homeserver
+        ];
+      };
+
+      checks.${system}.homeserver =
+        inputs.self.nixosConfigurations.homeserver.config.system.build.toplevel;
+
+      formatter = nixpkgs.lib.genAttrs [
+        "aarch64-darwin"
+        "x86_64-linux"
+      ] (targetSystem: nixpkgs.legacyPackages.${targetSystem}.nixfmt-tree);
+    };
+}
