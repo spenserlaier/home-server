@@ -8,7 +8,12 @@
   time.timeZone = "America/New_York";
 
   i18n.defaultLocale = "en_US.UTF-8";
-  console.keyMap = "us";
+  console = {
+    # 16x32 is the largest Linux-console font shipped by Terminus. Larger TTY
+    # text will require selecting a lower framebuffer resolution for the monitor.
+    font = "${pkgs.terminus_font}/share/consolefonts/ter-132n.psf.gz";
+    keyMap = "us";
+  };
 
   nix = {
     settings = {
