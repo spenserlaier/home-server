@@ -1,10 +1,10 @@
 { lib, ... }:
 {
-  # SAFETY: Replace this placeholder with the target NVMe's stable /dev/disk/by-id
-  # path before running disko. Never use an ambiguous path such as /dev/nvme0n1.
   disko.devices.disk.main = {
     type = "disk";
-    device = lib.mkDefault "/dev/disk/by-id/REPLACE-WITH-TARGET-DISK-ID";
+    # replace this id with the id of the drive of the system where we deploy
+    # (can be found by running `ls -l /dev/disk/by-id` from the machine running nix)
+    device = lib.mkDefault "/dev/disk/by-id/nvme-GMK_512GB_2025110702513";
     content = {
       type = "gpt";
       partitions = {
