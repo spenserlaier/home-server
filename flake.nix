@@ -25,6 +25,19 @@
         ];
       };
 
+      apps.${system} = {
+        disko = {
+          type = "app";
+          program = "${disko.packages.${system}.disko}/bin/disko";
+          meta.description = "Pinned Disko CLI for the x86_64 NixOS installer";
+        };
+        disko-install = {
+          type = "app";
+          program = "${disko.packages.${system}.disko-install}/bin/disko-install";
+          meta.description = "Pinned combined Disko and NixOS installer";
+        };
+      };
+
       checks.${system}.homeserver =
         inputs.self.nixosConfigurations.homeserver.config.system.build.toplevel;
 

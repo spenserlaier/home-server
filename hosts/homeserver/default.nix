@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   imports = [
     ./networking.nix
@@ -5,7 +6,10 @@
     ../../modules/base/firewall.nix
     ../../modules/base/server.nix
     ../../modules/base/users.nix
-  ];
+  ]
+  # Generate this file on the physical machine before its first install. A
+  # conditional import keeps remote evaluation possible until then.
+  ++ lib.optional (builtins.pathExists ./hardware-configuration.nix) ./hardware-configuration.nix;
 
   networking.hostName = "homeserver";
 

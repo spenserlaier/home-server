@@ -3,6 +3,9 @@
 Declarative NixOS configuration for the `homeserver` host. The architecture and
 deployment phases are described in [PLAN.md](./PLAN.md).
 
+The complete bare-metal installation and recovery procedure is in
+[docs/installation.md](./docs/installation.md).
+
 ## Current scope
 
 This repository currently defines the Phase 0 and initial Phase 1 host baseline:
@@ -37,20 +40,11 @@ On an `x86_64-linux` Nix machine, build without activating:
 nix build .#nixosConfigurations.homeserver.config.system.build.toplevel
 ```
 
-## Installation guardrails
+## Installation guardrail
 
-Disko repartitions its target and destroys data on it. Before installation:
-
-1. Boot the GMKtec from a NixOS installer.
-2. Confirm UEFI boot is enabled.
-3. Identify the intended disk with `ls -l /dev/disk/by-id/`.
-4. Replace `REPLACE-WITH-TARGET-DISK-ID` in
-   `hosts/homeserver/storage.nix` with that disk's full stable path.
-5. Review the resulting diff and independently confirm the disk identity.
-
-The installation commands will be documented and exercised once the physical
-disk identifier and generated hardware configuration are available. Do not run
-Disko while the placeholder remains.
+Disko repartitions its configured target and destroys all data on it. Follow the
+identity checks and explicit stop point in the installation runbook before
+running it.
 
 ## SSH access
 
