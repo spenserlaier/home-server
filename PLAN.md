@@ -129,7 +129,7 @@ Requirements:
 * Containerization is acceptable/preferred if upstream deployment is container-oriented
 * Avoid spending significant effort producing native Nix packaging unless it clearly improves maintainability
 
-### Tailscale / Headscale
+### Private overlay networking
 
 Remote access is explicitly a later phase.
 
@@ -143,8 +143,10 @@ Requirements:
 * Stable DNS names
 * Central reverse proxy
 * Avoid hardcoding LAN addresses into application state
-* Tailscale may be introduced first
-* Headscale may be evaluated later if self-hosted coordination is desirable
+* NetBird is currently the leading candidate, but this is not yet a final
+  architectural decision
+* Tailscale remains an alternative
+* Headscale may be evaluated if self-hosted Tailscale coordination is desirable
 
 ---
 
@@ -367,7 +369,7 @@ Secrets may include:
 * SMTP credentials
 * Paperless secrets
 * Samba scanner password
-* Future Tailscale/Headscale credentials
+* Future private-overlay-network credentials
 
 Rules:
 
@@ -419,7 +421,8 @@ Likely options:
 * Caddy
 * nginx
 
-The proxy should provide stable application endpoints and make future HTTPS/Tailscale integration straightforward.
+The proxy should provide stable application endpoints and make future HTTPS and
+private-overlay-network integration straightforward.
 
 Avoid exposing arbitrary application ports across the LAN when unnecessary.
 
@@ -818,10 +821,12 @@ Avoid adding monitoring infrastructure substantially more complex than the serve
 
 Optional later work:
 
-* Tailscale
+* Evaluate NetBird first; it is currently the preferred candidate
+* Retain Tailscale as an alternative
 * Private service access
 * DNS integration
-* Evaluate Headscale afterward
+* Evaluate Headscale only if the Tailscale ecosystem is selected and
+  self-hosted coordination is desirable
 
 Remote access must not require public exposure of application services.
 
@@ -966,4 +971,3 @@ Initial implementation target:
 7. Document how the MiniPC will be installed and rebuilt.
 
 Do not begin deploying application services until the base host design is stable.
-

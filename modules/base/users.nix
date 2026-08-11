@@ -9,5 +9,7 @@
     ];
   };
 
-  security.sudo.wheelNeedsPassword = true;
+  # SSH access is key-only, so requiring an unprovisioned account password here
+  # would prevent the administrator from using sudo.
+  security.sudo.wheelNeedsPassword = false;
 }

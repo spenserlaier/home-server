@@ -52,7 +52,7 @@ The installation commands will be documented and exercised once the physical
 disk identifier and generated hardware configuration are available. Do not run
 Disko while the placeholder remains.
 
-## SSH bootstrap
+## SSH access
 
 The administrator public key is intentionally committed because NixOS needs it
 to recreate access. Its fingerprint is:
@@ -62,14 +62,16 @@ SHA256:lQ+X2Tmh2mYvC2uvjyRBRpcnQAPfTyjW6h+WNtigSFc
 ```
 
 A public key is not an authentication secret, but committing it publicly links
-the key identity to this server and GitHub account. The private key and all
-passwords must remain outside this repository.
+the key identity to this server and GitHub account. The private key must remain
+outside this repository.
 
-Password authentication is temporarily enabled for bootstrap. After key-based
-login is verified from a second terminal, set `PasswordAuthentication = false`
-in `modules/base/server.nix`, rebuild, and verify a fresh login before closing
-the existing session. The user must receive a local password during installation
-for password-based SSH and password-protected `sudo` to function.
+SSH permits public-key authentication only: password and keyboard-interactive
+authentication are disabled, and root cannot log in over SSH. The
+`spenser-admin` user has passwordless `sudo`, avoiding an undeclared password
+dependency after key-based login. Before ending the installer session, verify a
+fresh SSH login and `sudo` command from a second terminal. Loss of the private
+key requires local console or NixOS installer recovery; a second declarative
+recovery key can be added later if desired.
 
 ## Public-repository rules
 
@@ -80,4 +82,3 @@ for password-based SSH and password-protected `sudo` to function.
 - Inspect `jj diff --git` and `jj status` before every push.
 - A future secrets framework must decrypt credentials only on the target host;
   plaintext credentials must never enter the Nix store or repository history.
-
