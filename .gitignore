@@ -4,6 +4,6 @@
 # Decrypted secrets and local deployment overrides must never be committed.
 /secrets/*.dec.*
 /secrets/*.plain.*
+/secrets/README.local
 /.env
 /.env.*
-

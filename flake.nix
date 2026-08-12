@@ -8,10 +8,20 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    inputs@{ nixpkgs, disko, ... }:
+    inputs@{
+      nixpkgs,
+      disko,
+      sops-nix,
+      ...
+    }:
     let
       system = "x86_64-linux";
     in
@@ -21,6 +31,7 @@
         specialArgs = { inherit inputs; };
         modules = [
           disko.nixosModules.disko
+          sops-nix.nixosModules.sops
           ./hosts/homeserver
         ];
       };

@@ -7,6 +7,8 @@ The complete bare-metal installation and recovery procedure is in
 [docs/installation.md](./docs/installation.md).
 Persistent-state ownership and layout conventions are documented in
 [docs/persistent-state.md](./docs/persistent-state.md).
+Secrets bootstrap, editing, deployment, and recovery are documented in
+[docs/secrets.md](./docs/secrets.md).
 
 ## Current scope
 

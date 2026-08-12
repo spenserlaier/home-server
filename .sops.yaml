@@ -1,0 +1,14 @@
+# Public encryption recipients only. Never place a private key in this file.
+# The homeserver recipient is derived from its Ed25519 SSH host public key. See
+# docs/secrets.md for rotation and disaster-recovery procedures.
+keys:
+  - &spenser_admin ssh-ed25519
+    AAAAC3NzaC1lZDI1NTE5AAAAIC0TQC9jgyIvsoI+Uj+Ta/I4B3QMC0usi2cLOvCu0FCp
+  - &homeserver age1rn4yr4wcc99qyme28kemz3ae27mj5xksw54lhllk62pguncps35sfdh5ux
+
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *spenser_admin
+          - *homeserver

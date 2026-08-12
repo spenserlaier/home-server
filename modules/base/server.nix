@@ -33,6 +33,8 @@
   environment.systemPackages = with pkgs; [
     git
     jujutsu
+    sops
+    ssh-to-age
     vim
   ];
 
