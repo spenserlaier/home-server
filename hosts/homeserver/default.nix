@@ -4,6 +4,7 @@
     ./networking.nix
     ./storage.nix
     ../../modules/base/firewall.nix
+    ../../modules/base/persistent-state.nix
     ../../modules/base/server.nix
     ../../modules/base/users.nix
   ]
