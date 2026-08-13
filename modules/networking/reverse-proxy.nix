@@ -23,33 +23,13 @@ in
     };
 
     enableDnsChallenge = lib.mkEnableOption "Porkbun DNS-01 certificate issuance";
-
-    porkbunEnvironmentFile = lib.mkOption {
-      type = lib.types.nullOr lib.types.path;
-      default = null;
-      example = "/run/secrets-rendered/caddy-porkbun.env";
-      description = ''
-        Runtime environment file containing PORKBUN_API_KEY and
-        PORKBUN_API_SECRET_KEY. The file must not be stored in the Nix store.
-      '';
-    };
   };
 
   config = lib.mkIf cfg.enable {
-    assertions = [
-      {
-        assertion = cfg.enableDnsChallenge -> cfg.porkbunEnvironmentFile != null;
-        message = ''
-          homelab.reverseProxy.enableDnsChallenge requires
-          homelab.reverseProxy.porkbunEnvironmentFile
-        '';
-      }
-    ];
-
     services.caddy = {
       enable = true;
       package = caddyWithPorkbun;
-      environmentFile = lib.mkIf cfg.enableDnsChallenge cfg.porkbunEnvironmentFile;
+      environmentFile = lib.mkIf cfg.enableDnsChallenge config.sops.templates."caddy-porkbun.env".path;
       openFirewall = false;
 
       globalConfig = lib.optionalString cfg.enableDnsChallenge ''
@@ -74,6 +54,23 @@ in
     networking.firewall = {
       allowedTCPPorts = [ 80 ] ++ lib.optional cfg.enableDnsChallenge 443;
       allowedUDPPorts = lib.optional cfg.enableDnsChallenge 443;
+    };
+
+    sops = lib.mkIf cfg.enableDnsChallenge {
+      defaultSopsFile = ../../secrets/homeserver.yaml;
+      secrets = {
+        "caddy/porkbun_api_key" = { };
+        "caddy/porkbun_api_secret_key" = { };
+      };
+      templates."caddy-porkbun.env" = {
+        owner = "caddy";
+        group = "caddy";
+        mode = "0400";
+        content = ''
+          PORKBUN_API_KEY=${config.sops.placeholder."caddy/porkbun_api_key"}
+          PORKBUN_API_SECRET_KEY=${config.sops.placeholder."caddy/porkbun_api_secret_key"}
+        '';
+      };
     };
   };
 }

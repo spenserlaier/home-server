@@ -19,10 +19,7 @@
   homelab.reverseProxy = {
     enable = true;
     baseDomain = "home.hyrax.fyi";
-
-    # Enable after creating the Porkbun credentials described in
-    # docs/networking.md and wiring its rendered environment file here.
-    enableDnsChallenge = false;
+    enableDnsChallenge = true;
   };
 
   nixpkgs.hostPlatform = "x86_64-linux";

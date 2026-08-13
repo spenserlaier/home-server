@@ -22,26 +22,24 @@ HOMESERVER_LAN_ADDRESS caddy.home.hyrax.fyi
 Do not publish the LAN address through Porkbun. Public DNS is used only for
 ACME DNS-01 challenge records, which Caddy creates and removes automatically.
 
-## Caddy bootstrap
+## Caddy health endpoint
 
-The initial configuration enables Caddy at:
+The bootstrap configuration initially used plain HTTP to test local DNS and
+firewall behavior before provisioning ACME credentials. The active endpoint is
+now:
 
 ```text
-http://caddy.home.hyrax.fyi/healthz
+https://caddy.home.hyrax.fyi/healthz
 ```
-
-This intentionally remains HTTP until Porkbun credentials have been encrypted
-with SOPS. It provides a way to verify DNS, firewall, and Caddy independently
-of certificate issuance.
 
 After deployment, verify it from another LAN machine:
 
 ```console
-curl --fail http://caddy.home.hyrax.fyi/healthz
+curl --fail https://caddy.home.hyrax.fyi/healthz
 ```
 
 The response must be `ok`. Other paths are aborted rather than serving a
-default site.
+default site. Requests over HTTP redirect to HTTPS.
 
 ## Porkbun DNS-01 credentials
 
@@ -55,36 +53,12 @@ caddy:
   porkbun_api_secret_key: replace-me
 ```
 
-Then declare the two SOPS secrets and render a root-owned environment file in
-the host configuration:
+The reverse-proxy module declares both secret paths and renders a `0400`,
+`caddy:caddy` environment file below `/run/secrets-rendered`. Caddy receives
+only that runtime path; neither plaintext value enters the Nix store.
 
-```nix
-sops = {
-  defaultSopsFile = ../../secrets/homeserver.yaml;
-  secrets = {
-    "caddy/porkbun_api_key" = { };
-    "caddy/porkbun_api_secret_key" = { };
-  };
-  templates."caddy-porkbun.env" = {
-    owner = "caddy";
-    group = "caddy";
-    mode = "0400";
-    content = ''
-      PORKBUN_API_KEY=${config.sops.placeholder."caddy/porkbun_api_key"}
-      PORKBUN_API_SECRET_KEY=${config.sops.placeholder."caddy/porkbun_api_secret_key"}
-    '';
-  };
-};
-
-homelab.reverseProxy = {
-  enableDnsChallenge = true;
-  porkbunEnvironmentFile = config.sops.templates."caddy-porkbun.env".path;
-};
-```
-
-Rebuild first with Let's Encrypt's staging endpoint if repeated certificate
-testing is necessary. Once enabled, verify that Caddy obtains a certificate and
-that no A or AAAA record for the private name exists in public DNS:
+After rebuilding, verify that Caddy obtains a certificate and that no A or AAAA
+record for the private name exists in public DNS:
 
 ```console
 curl --fail https://caddy.home.hyrax.fyi/healthz
