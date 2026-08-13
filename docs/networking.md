@@ -57,6 +57,10 @@ The reverse-proxy module declares both secret paths and renders a `0400`,
 `caddy:caddy` environment file below `/run/secrets-rendered`. Caddy receives
 only that runtime path; neither plaintext value enters the Nix store.
 
+Certificate issuance checks propagation through public recursive resolvers,
+rather than depending on the server's LAN resolver. It waits up to ten minutes
+because Porkbun challenge records currently have a 600-second TTL.
+
 After rebuilding, verify that Caddy obtains a certificate and that no A or AAAA
 record for the private name exists in public DNS:
 
