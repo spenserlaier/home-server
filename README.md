@@ -9,6 +9,8 @@ Persistent-state ownership and layout conventions are documented in
 [docs/persistent-state.md](./docs/persistent-state.md).
 Secrets bootstrap, editing, deployment, and recovery are documented in
 [docs/secrets.md](./docs/secrets.md).
+Private DNS, Caddy bootstrap, and Porkbun DNS-01 setup are documented in
+[docs/networking.md](./docs/networking.md).
 
 ## Current scope
 
@@ -21,7 +23,8 @@ This repository currently defines the Phase 0 and initial Phase 1 host baseline:
 - a default-deny firewall with SSH allowed
 - a Disko-managed GPT/Btrfs layout
 
-No application services or secrets are configured yet.
+Caddy is enabled as the reverse-proxy foundation. No application services or
+runtime secrets are configured yet.
 
 ## Development checks
 

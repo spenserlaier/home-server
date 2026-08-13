@@ -8,12 +8,22 @@
     ../../modules/base/secrets.nix
     ../../modules/base/server.nix
     ../../modules/base/users.nix
+    ../../modules/networking/reverse-proxy.nix
   ]
   # Generate this file on the physical machine before its first install. A
   # conditional import keeps remote evaluation possible until then.
   ++ lib.optional (builtins.pathExists ./hardware-configuration.nix) ./hardware-configuration.nix;
 
   networking.hostName = "homeserver";
+
+  homelab.reverseProxy = {
+    enable = true;
+    baseDomain = "home.hyrax.fyi";
+
+    # Enable after creating the Porkbun credentials described in
+    # docs/networking.md and wiring its rendered environment file here.
+    enableDnsChallenge = false;
+  };
 
   nixpkgs.hostPlatform = "x86_64-linux";
 

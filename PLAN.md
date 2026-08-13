@@ -403,14 +403,15 @@ Use local DNS rather than relying permanently on ports and IP addresses.
 Suggested names:
 
 ```text
-jellyfin.home.arpa
-paperless.home.arpa
-invoice.home.arpa
-books.home.arpa
-moodist.home.arpa
+jellyfin.home.hyrax.fyi
+paperless.home.hyrax.fyi
+invoice.home.hyrax.fyi
+books.home.hyrax.fyi
+moodist.home.hyrax.fyi
 ```
 
-Use `home.arpa`, not `.local`.
+Use the privately resolved `home.hyrax.fyi` subdomain, not `.local`. Public DNS
+must not publish private service addresses.
 
 ## Reverse proxy
 
