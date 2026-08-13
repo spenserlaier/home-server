@@ -7,7 +7,9 @@
 let
   cfg = config.homelab.backup.jellyfin;
   archiveDir = "/srv/backups/services/jellyfin";
-  nativeBackupDir = "${config.services.jellyfin.dataDir}/backups";
+  # Jellyfin derives its internal DataPath as <ProgramDataPath>/data, where
+  # the NixOS module's dataDir is ProgramDataPath.
+  nativeBackupDir = "${config.services.jellyfin.dataDir}/data/backups";
 
   createBackup = pkgs.writeShellApplication {
     name = "backup-jellyfin";
@@ -192,7 +194,6 @@ in
       owner = "jellyfin";
       group = "jellyfin";
       mode = "0400";
-      restartUnits = [ "jellyfin-backup.service" ];
     };
 
     systemd.tmpfiles.rules = [
