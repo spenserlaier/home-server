@@ -8,6 +8,7 @@
     ../../modules/base/secrets.nix
     ../../modules/base/server.nix
     ../../modules/base/users.nix
+    ../../modules/backup/jellyfin-native.nix
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/jellyfin.nix
   ]
@@ -22,6 +23,8 @@
     baseDomain = "home.hyrax.fyi";
     enableDnsChallenge = true;
   };
+
+  homelab.backup.jellyfin.enable = true;
 
   nixpkgs.hostPlatform = "x86_64-linux";
 
