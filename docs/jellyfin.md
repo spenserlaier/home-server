@@ -63,7 +63,9 @@ users, libraries, and plugins.
 The GMKtec M5 Ultra uses a Ryzen 7 7730U with AMD Vega graphics. Nix configures
 Jellyfin to use VA-API through `/dev/dri/renderD128` for supported H.264, HEVC,
 MPEG-2, VC-1, VP8, and VP9 workloads. AV1 is excluded because this GPU
-generation does not provide AV1 hardware decoding.
+generation does not provide AV1 hardware decoding. The NixOS graphics stack is
+enabled explicitly because this headless host has no desktop module that would
+otherwise populate `/run/opengl-driver` with Mesa's `radeonsi` VA-API driver.
 
 Confirm the render device and VA-API capabilities on the server:
 

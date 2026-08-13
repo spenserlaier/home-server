@@ -45,6 +45,10 @@ in
     };
   };
 
+  # Populate /run/opengl-driver with Mesa's radeonsi VA-API driver. Headless
+  # NixOS hosts do not enable the graphics driver environment by default.
+  hardware.graphics.enable = true;
+
   users = {
     groups.media = { };
     users = {
