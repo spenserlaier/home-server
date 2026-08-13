@@ -71,7 +71,8 @@ Confirm the render device and VA-API capabilities on the server:
 
 ```console
 ls -l /dev/dri/renderD128
-sudo -u jellyfin vainfo --display drm --device /dev/dri/renderD128
+sudo -u jellyfin env XDG_CACHE_HOME=/srv/jellyfin/cache \
+  vainfo --display drm --device /dev/dri/renderD128
 ```
 
 After playing media that requires transcoding, verify that the playback info

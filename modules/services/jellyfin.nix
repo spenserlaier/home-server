@@ -69,6 +69,7 @@ in
   ];
 
   systemd.services.jellyfin = {
+    environment.XDG_CACHE_HOME = "/srv/jellyfin/cache";
     unitConfig.RequiresMountsFor = [ "/srv/media" ];
     serviceConfig.ReadOnlyPaths = [ "/srv/media" ];
   };
