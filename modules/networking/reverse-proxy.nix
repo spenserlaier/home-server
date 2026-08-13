@@ -63,8 +63,10 @@ in
         hostName =
           if cfg.enableDnsChallenge then "caddy.${cfg.baseDomain}" else "http://caddy.${cfg.baseDomain}";
         extraConfig = ''
-          respond /healthz "ok" 200
-          abort
+          route {
+            respond /healthz "ok" 200
+            abort
+          }
         '';
       };
     };
