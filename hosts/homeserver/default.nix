@@ -9,6 +9,7 @@
     ../../modules/base/server.nix
     ../../modules/base/users.nix
     ../../modules/networking/reverse-proxy.nix
+    ../../modules/services/jellyfin.nix
   ]
   # Generate this file on the physical machine before its first install. A
   # conditional import keeps remote evaluation possible until then.

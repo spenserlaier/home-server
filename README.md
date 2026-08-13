@@ -11,6 +11,8 @@ Secrets bootstrap, editing, deployment, and recovery are documented in
 [docs/secrets.md](./docs/secrets.md).
 Private DNS, Caddy bootstrap, and Porkbun DNS-01 setup are documented in
 [docs/networking.md](./docs/networking.md).
+Jellyfin deployment, state, media, and verification are documented in
+[docs/jellyfin.md](./docs/jellyfin.md).
 
 ## Current scope
 
@@ -23,8 +25,9 @@ This repository currently defines the Phase 0 and initial Phase 1 host baseline:
 - a default-deny firewall with SSH allowed
 - a Disko-managed GPT/Btrfs layout
 
-Caddy is enabled as the reverse-proxy foundation. No application services or
-runtime secrets are configured yet.
+Caddy provides the private HTTPS reverse proxy, and Jellyfin is the first
+application service. Porkbun credentials are delivered at runtime through
+sops-nix.
 
 ## Development checks
 

@@ -32,21 +32,25 @@ in
       environmentFile = lib.mkIf cfg.enableDnsChallenge config.sops.templates."caddy-porkbun.env".path;
       openFirewall = false;
 
+      extraConfig = lib.optionalString cfg.enableDnsChallenge ''
+        (private_tls) {
+          tls {
+            dns porkbun {
+              api_key {env.PORKBUN_API_KEY}
+              api_secret_key {env.PORKBUN_API_SECRET_KEY}
+            }
+            propagation_delay 30s
+            propagation_timeout 10m
+            resolvers 1.1.1.1 8.8.8.8
+          }
+        }
+      '';
+
       virtualHosts."caddy.${cfg.baseDomain}" = {
         hostName =
           if cfg.enableDnsChallenge then "caddy.${cfg.baseDomain}" else "http://caddy.${cfg.baseDomain}";
         extraConfig = ''
-          ${lib.optionalString cfg.enableDnsChallenge ''
-            tls {
-              dns porkbun {
-                api_key {env.PORKBUN_API_KEY}
-                api_secret_key {env.PORKBUN_API_SECRET_KEY}
-              }
-              propagation_delay 30s
-              propagation_timeout 10m
-              resolvers 1.1.1.1 8.8.8.8
-            }
-          ''}
+          ${lib.optionalString cfg.enableDnsChallenge "import private_tls"}
           route {
             respond /healthz "ok" 200
             abort
