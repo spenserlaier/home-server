@@ -45,6 +45,9 @@ let
     trap 'rm -r -- "$working_dir"' EXIT
     config_file="$working_dir/repository.config"
     cache_dir="$working_dir/cache"
+    KOPIA_LOG_DIR="$working_dir/logs"
+    KOPIA_CHECK_FOR_UPDATES=false
+    export KOPIA_LOG_DIR KOPIA_CHECK_FOR_UPDATES
 
     ${administrativeCredentialEnvironment}
     kopia --config-file="$config_file" repository connect s3 \
@@ -194,7 +197,11 @@ let
     LoadCredential = credentials;
     CacheDirectory = "kopia";
     CacheDirectoryMode = "0700";
-    Environment = "KOPIA_CACHE_DIRECTORY=/var/cache/kopia";
+    Environment = [
+      "KOPIA_CACHE_DIRECTORY=/var/cache/kopia"
+      "KOPIA_LOG_DIR=/var/cache/kopia/logs"
+      "KOPIA_CHECK_FOR_UPDATES=false"
+    ];
     PrivateTmp = true;
     NoNewPrivileges = true;
     ProtectHome = true;
