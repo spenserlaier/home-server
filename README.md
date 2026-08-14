@@ -15,6 +15,8 @@ Jellyfin deployment, state, media, and verification are documented in
 [docs/jellyfin.md](./docs/jellyfin.md).
 Paperless deployment, persistence, exports, and initial verification are
 documented in [docs/paperless.md](./docs/paperless.md).
+Brother scanner SFTP ingestion and verification are documented in
+[docs/paperless-scanner.md](./docs/paperless-scanner.md).
 Encrypted off-host backup initialization, verification, and restore operations
 are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
 

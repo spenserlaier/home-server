@@ -13,6 +13,7 @@
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/jellyfin.nix
     ../../modules/services/paperless.nix
+    ../../modules/services/paperless-scanner.nix
   ]
   # Generate this file on the physical machine before its first install. A
   # conditional import keeps remote evaluation possible until then.
