@@ -7,6 +7,7 @@
 let
   cfg = config.homelab.backup.kopia;
   repositoryConfig = ''"$RUNTIME_DIRECTORY/repository.config"'';
+  restoreRoot = "/srv/restore-tests";
 
   credentialEnvironment = ''
     KOPIA_PASSWORD="$(<"$CREDENTIALS_DIRECTORY/repository-password")"
@@ -22,6 +23,104 @@ let
     --retention-mode=${lib.escapeShellArg cfg.objectLock.mode} \
     --retention-period=${lib.escapeShellArg cfg.objectLock.period}
   '';
+
+  readOnlyRepositoryArguments = ''
+    --bucket=${lib.escapeShellArg cfg.bucket} \
+    --endpoint=${lib.escapeShellArg cfg.endpoint} \
+    --region=${lib.escapeShellArg cfg.region} \
+    --readonly
+  '';
+
+  administrativeCredentialEnvironment = ''
+    KOPIA_PASSWORD="$(<${lib.escapeShellArg config.sops.secrets."kopia/repository_password".path})"
+    AWS_ACCESS_KEY_ID="$(<${lib.escapeShellArg config.sops.secrets."kopia/b2_key_id".path})"
+    AWS_SECRET_ACCESS_KEY="$(<${
+      lib.escapeShellArg config.sops.secrets."kopia/b2_application_key".path
+    })"
+    export KOPIA_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+  '';
+
+  connectReadOnlyRepository = ''
+    working_dir="$(mktemp --directory --tmpdir=/run kopia-readonly.XXXXXX)"
+    trap 'rm -r -- "$working_dir"' EXIT
+    config_file="$working_dir/repository.config"
+    cache_dir="$working_dir/cache"
+
+    ${administrativeCredentialEnvironment}
+    kopia --config-file="$config_file" repository connect s3 \
+      --cache-directory="$cache_dir" \
+      ${readOnlyRepositoryArguments}
+  '';
+
+  listSnapshots = pkgs.writeShellApplication {
+    name = "list-kopia-snapshots";
+    runtimeInputs = with pkgs; [
+      coreutils
+      kopia
+    ];
+    text = ''
+      if [[ $EUID -ne 0 ]]; then
+        echo "This command must run as root" >&2
+        exit 1
+      fi
+      if [[ $# -ne 0 ]]; then
+        echo "Usage: list-kopia-snapshots" >&2
+        exit 2
+      fi
+
+      ${connectReadOnlyRepository}
+      kopia --config-file="$config_file" snapshot list --all
+    '';
+  };
+
+  restoreSnapshot = pkgs.writeShellApplication {
+    name = "restore-kopia-snapshot";
+    runtimeInputs = with pkgs; [
+      coreutils
+      kopia
+    ];
+    text = ''
+      if [[ $EUID -ne 0 ]]; then
+        echo "This command must run as root" >&2
+        exit 1
+      fi
+      if [[ $# -ne 2 ]]; then
+        echo "Usage: restore-kopia-snapshot SNAPSHOT_ROOT_ID TARGET_DIRECTORY" >&2
+        exit 2
+      fi
+
+      snapshot_id="$1"
+      [[ "$snapshot_id" =~ ^k[[:xdigit:]]+$ ]] || {
+        echo "Snapshot root ID must begin with k and contain only hexadecimal characters" >&2
+        exit 1
+      }
+
+      restore_root="$(realpath -e -- ${lib.escapeShellArg restoreRoot})"
+      target="$(realpath -m -- "$2")"
+      case "$target" in
+        "$restore_root"/*) ;;
+        *)
+          echo "Target must be a new path beneath $restore_root" >&2
+          exit 1
+          ;;
+      esac
+      [[ ! -e "$target" && ! -L "$target" ]] || {
+        echo "Restore target already exists: $target" >&2
+        exit 1
+      }
+      [[ -d "$(dirname -- "$target")" ]] || {
+        echo "Restore target parent does not exist" >&2
+        exit 1
+      }
+
+      ${connectReadOnlyRepository}
+      kopia --config-file="$config_file" snapshot restore \
+        --write-files-atomically \
+        "$snapshot_id" "$target"
+
+      echo "Restored Kopia snapshot $snapshot_id to $target"
+    '';
+  };
 
   initializeRepository = pkgs.writeShellApplication {
     name = "initialize-kopia-repository";
@@ -193,6 +292,8 @@ in
       };
     };
 
+    systemd.tmpfiles.rules = [ "d ${restoreRoot} 0700 root root - -" ];
+
     systemd.services = {
       kopia-repository-init = {
         description = "Initialize the dedicated Kopia repository";
@@ -255,5 +356,10 @@ in
         };
       };
     };
+
+    environment.systemPackages = [
+      listSnapshots
+      restoreSnapshot
+    ];
   };
 }

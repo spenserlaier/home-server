@@ -76,13 +76,44 @@ On a replacement host, deploy the NixOS configuration and restore the SOPS age
 identity first. The three Kopia secrets are sufficient to reconnect to the
 repository; do not depend on state from `/var/cache/kopia` or `/run/kopia`.
 
-Before restoring, stop application services and choose the exact snapshot from
-Kopia's snapshot list. Restore `/srv/backups` to a temporary directory, inspect
-it, and then invoke each application's restore contract. For Jellyfin:
+List the available generations through a temporary, read-only Kopia connection:
+
+```console
+sudo list-kopia-snapshots
+```
+
+Each entry includes a root object ID beginning with `k`. Restore that root into
+a new path beneath the dedicated restore-test boundary:
+
+```console
+sudo restore-kopia-snapshot \
+  kSNAPSHOT_ROOT_ID \
+  /srv/restore-tests/kopia-YYYYMMDD
+```
+
+The helper refuses existing targets and paths outside `/srv/restore-tests`. It
+connects to the repository read-only, uses ephemeral configuration and cache
+directories, and restores files atomically. It never writes into the live
+`/srv/backups` staging tree.
+
+Validate the recovered Jellyfin artifact without changing the running service:
+
+```console
+sudo validate-service-jellyfin-backup \
+  /srv/restore-tests/kopia-YYYYMMDD/services/jellyfin/jellyfin-backup-TIMESTAMP.zip
+```
+
+This repeats the same ZIP, manifest, database-history, configuration, and
+backup-option checks used when the archive was created. A successful validation
+proves the artifact survived upload, encryption, remote storage, download,
+decryption, and restoration.
+
+Only during disaster recovery or an isolated application-level restore drill
+should the validated artifact be applied to Jellyfin:
 
 ```console
 sudo restore-service-jellyfin \
-  /path/to/restored/services/jellyfin/jellyfin-backup-TIMESTAMP.zip
+  /srv/restore-tests/kopia-YYYYMMDD/services/jellyfin/jellyfin-backup-TIMESTAMP.zip
 ```
 
 Do not restore staging files directly over live application state. The native

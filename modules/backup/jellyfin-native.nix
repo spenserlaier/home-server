@@ -11,15 +11,51 @@ let
   # the NixOS module's dataDir is ProgramDataPath.
   nativeBackupDir = "${config.services.jellyfin.dataDir}/data/backups";
 
+  validateBackup = pkgs.writeShellApplication {
+    name = "validate-service-jellyfin-backup";
+    runtimeInputs = with pkgs; [
+      coreutils
+      gnugrep
+      jq
+      unzip
+    ];
+    text = ''
+      if [[ $# -ne 1 ]]; then
+        echo "Usage: validate-service-jellyfin-backup BACKUP.zip" >&2
+        exit 2
+      fi
+
+      archive="$(realpath -e -- "$1")"
+      [[ -f "$archive" && ! -L "$archive" ]] || {
+        echo "Backup must be a regular, non-symlink file" >&2
+        exit 1
+      }
+
+      unzip -tq "$archive"
+      unzip -Z1 "$archive" | grep --fixed-strings --line-regexp 'manifest.json' >/dev/null
+      unzip -Z1 "$archive" | grep --fixed-strings --line-regexp 'Database/HistoryRow.json' >/dev/null
+      unzip -Z1 "$archive" | grep --extended-regexp '^Config/.+\.(xml|json)$' >/dev/null
+      unzip -p "$archive" manifest.json | jq --exit-status '
+        .Options.Database == true and
+        .Options.Metadata == true and
+        .Options.Subtitles == true and
+        .Options.Trickplay == false and
+        (.ServerVersion | type == "string" and length > 0) and
+        (.BackupEngineVersion | type == "string" and length > 0)
+      ' >/dev/null
+
+      echo "Validated Jellyfin backup: $archive"
+    '';
+  };
+
   createBackup = pkgs.writeShellApplication {
     name = "backup-jellyfin";
     runtimeInputs = with pkgs; [
       coreutils
       curl
-      gnugrep
       jq
-      unzip
       util-linux
+      validateBackup
     ];
     text = ''
       token_file=${lib.escapeShellArg config.sops.secrets."jellyfin/api_key".path}
@@ -75,18 +111,7 @@ let
         echo "Jellyfin did not create a regular backup archive" >&2
         exit 1
       }
-      unzip -tq "$archive"
-      unzip -Z1 "$archive" | grep --fixed-strings --line-regexp 'manifest.json' >/dev/null
-      unzip -Z1 "$archive" | grep --fixed-strings --line-regexp 'Database/HistoryRow.json' >/dev/null
-      unzip -Z1 "$archive" | grep --extended-regexp '^Config/.+\.(xml|json)$' >/dev/null
-      unzip -p "$archive" manifest.json | jq --exit-status '
-        .Options.Database == true and
-        .Options.Metadata == true and
-        .Options.Subtitles == true and
-        .Options.Trickplay == false and
-        (.ServerVersion | type == "string" and length > 0) and
-        (.BackupEngineVersion | type == "string" and length > 0)
-      ' >/dev/null
+      validate-service-jellyfin-backup "$archive"
 
       destination="$archive_dir/$(basename "$archive")"
       mv --no-clobber "$archive" "$destination"
@@ -108,8 +133,8 @@ let
       coreutils
       curl
       systemd
-      unzip
       util-linux
+      validateBackup
     ];
     text = ''
       if [[ $# -ne 1 ]]; then
@@ -122,11 +147,7 @@ let
       fi
 
       archive="$(realpath -e -- "$1")"
-      [[ -f "$archive" && ! -L "$archive" ]] || {
-        echo "Backup must be a regular file" >&2
-        exit 1
-      }
-      unzip -tq "$archive"
+      validate-service-jellyfin-backup "$archive"
 
       printf 'Restore Jellyfin from %s? This replaces its current state. [y/N] ' "$archive"
       read -r confirmation
@@ -245,6 +266,9 @@ in
       };
     };
 
-    environment.systemPackages = [ restoreBackup ];
+    environment.systemPackages = [
+      restoreBackup
+      validateBackup
+    ];
   };
 }
