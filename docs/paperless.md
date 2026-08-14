@@ -6,9 +6,10 @@ Paperless-ngx 2.20.15 is available privately at:
 https://paperless.home.hyrax.fyi
 ```
 
-The initial slice uses the NixOS-native Paperless module with local PostgreSQL
-and Redis. Scanner delivery and Samba are deliberately deferred until ordinary
-web upload, OCR, export, and recovery have been verified.
+The deployment uses the NixOS-native Paperless module with local PostgreSQL and
+Redis. The Brother scanner delivers PDFs through a restricted SFTP staging
+account and atomic handoff documented in
+[paperless-scanner.md](./paperless-scanner.md).
 
 ## Persistent state
 

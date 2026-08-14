@@ -22,18 +22,24 @@ are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
 
 ## Current scope
 
-This repository currently defines the Phase 0 and initial Phase 1 host baseline:
+This repository currently implements the platform through the Paperless and
+off-host-backup milestones (Phases 0–5):
 
 - NixOS 26.05 on `x86_64-linux`
 - UEFI/systemd-boot
 - DHCP networking (use a router reservation for a stable address)
-- SSH access for `spenser-admin`
-- a default-deny firewall with SSH allowed
-- a Disko-managed GPT/Btrfs layout
+- SSH access for `spenser-admin` and a default-deny firewall
+- a Disko-managed GPT/Btrfs layout with persistent state beneath `/srv`
+- SOPS-managed runtime secrets
+- private HTTPS through Caddy and Porkbun DNS-01
+- Jellyfin with hardware transcoding and native backup artifacts
+- Paperless-ngx with PostgreSQL, native exports, and direct scanner ingestion
+- encrypted, immutable off-host Kopia generations in Backblaze B2
 
-Caddy provides the private HTTPS reverse proxy, and Jellyfin is the first
-application service. Porkbun credentials are delivered at runtime through
-sops-nix.
+The next major application milestone is a clean, reproducible Invoice Ninja
+deployment. Migration of existing Invoice Ninja state remains a separate later
+step. Pi-hole, operational hardening, remote access, and secondary services are
+also intentionally deferred.
 
 ## Development checks
 
@@ -90,5 +96,5 @@ recovery key can be added later if desired.
 - Treat application hostnames, usernames, public keys, disk identifiers, and
   hardware details as public metadata once committed.
 - Inspect `jj diff --git` and `jj status` before every push.
-- A future secrets framework must decrypt credentials only on the target host;
-  plaintext credentials must never enter the Nix store or repository history.
+- SOPS must decrypt credentials only on the target host; plaintext credentials
+  must never enter the Nix store or repository history.

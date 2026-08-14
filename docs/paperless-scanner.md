@@ -12,6 +12,12 @@ The `paperless-scanner` account is confined to internal SFTP, has no shell or
 forwarding facilities, and its authorized key is accepted only from the
 scanner's reserved address, `192.168.4.38`.
 
+The initial physical scan has completed this path successfully and its
+handwritten content was searchable through Paperless OCR. Duplex behavior,
+blank-page removal, a naturally scheduled backup, and a restored-document drill
+remain deferred acceptance tests. The retained test document is the payload for
+that later backup exercise.
+
 ## Scanner profile
 
 Use these values in the Brother web interface:

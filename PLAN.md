@@ -23,6 +23,27 @@ The implementation should favor understandable, boring infrastructure over unnec
 
 ---
 
+## Current implementation status
+
+Phases 0–5 are operational. The host, persistent-state conventions, SOPS
+secrets, private Caddy endpoints, Jellyfin, Paperless, direct Brother scanner
+ingestion, native service exports, and encrypted off-host Kopia generations
+have all been deployed and exercised.
+
+The scanner implementation uses key-authenticated SFTP into an isolated staging
+directory followed by a closed-and-settled-file check and atomic handoff to
+Paperless. This replaces the original proposed Samba design.
+
+Deferred acceptance work includes a naturally scheduled backup run, a retained
+Paperless-document restore, duplex and blank-page scanner profiles, and broader
+reboot/recovery drills. These tests should be combined where practical and do
+not block the next development phase.
+
+The immediate development target is Phase 6: a clean, reproducible Invoice
+Ninja deployment with empty test data. Migration remains Phase 7.
+
+---
+
 # 2. Target Services
 
 ## Core services
@@ -48,8 +69,9 @@ Requirements:
 * Persistent database, media, and application state
 * Dedicated consumption directory
 * Integration with Brother ADS-4300N scanner
-* Scanner should be able to send documents directly to the server using SMB/CIFS
-* Scanner credentials should have minimal privileges
+* Scanner should send documents directly using key-authenticated SFTP
+* Scanner identity should be restricted to its reserved LAN address and an
+  SFTP-only chroot
 * Initial workflow should prioritize reliability over sophisticated automatic classification
 
 Desired initial workflow:
@@ -57,7 +79,9 @@ Desired initial workflow:
 ```text
 Brother ADS-4300N
         ↓
-SMB/CIFS share
+isolated SFTP staging directory
+        ↓
+closed/settled-file validation and atomic rename
         ↓
 Paperless consumption directory
         ↓
@@ -184,7 +208,6 @@ Likely native services include:
 
 * Jellyfin
 * Paperless-ngx
-* Samba
 * Reverse proxy
 * Backup timers/jobs
 * Supporting databases where sensible
@@ -214,8 +237,10 @@ Target layout:
 ├── paperless/
 │   ├── consume/
 │   ├── media/
-│   ├── data/
-│   └── export/
+│   └── data/
+│
+├── paperless-scanner/
+│   └── inbox/
 │
 ├── invoiceninja/
 │   ├── database/
@@ -224,6 +249,7 @@ Target layout:
 │   └── config/
 │
 ├── jellyfin/
+│   ├── data/
 │   ├── config/
 │   └── cache/
 │
@@ -238,8 +264,14 @@ Target layout:
 ├── moodist/
 │   └── data/
 │
-└── backups/
-    └── database/
+├── postgresql/
+│
+├── backups/
+│   └── services/
+│       ├── jellyfin/
+│       └── paperless/
+│
+└── restore-tests/
 ```
 
 Exact paths may change where NixOS modules impose sensible defaults, but the conceptual boundary should remain.
@@ -318,7 +350,7 @@ Initial target:
 │   ├── services/
 │   │   ├── jellyfin.nix
 │   │   ├── paperless.nix
-│   │   ├── samba.nix
+│   │   ├── paperless-scanner.nix
 │   │   ├── invoiceninja.nix
 │   │   ├── pihole.nix
 │   │   ├── audiobookshelf.nix
@@ -344,7 +376,7 @@ Initial target:
     ├── deployment.md
     ├── backup-and-restore.md
     ├── invoiceninja-migration.md
-    └── scanner-setup.md
+    └── paperless-scanner.md
 ```
 
 Do not create empty files/modules merely to satisfy this proposed layout.
@@ -370,7 +402,6 @@ Secrets may include:
 * Invoice Ninja database password
 * SMTP credentials
 * Paperless secrets
-* Samba scanner password
 * Future private-overlay-network credentials
 
 Rules:
@@ -433,25 +464,26 @@ Avoid exposing arbitrary application ports across the LAN when unnecessary.
 
 # 10. Paperless Scanner Integration
 
-Create a dedicated Samba share corresponding to the Paperless consumption directory.
+Use the Brother ADS-4300N's public-key SFTP support. Uploads first enter an
+isolated chroot and are not placed directly into the Paperless consumption
+directory.
 
-Example conceptual configuration:
+Implemented flow:
 
 ```text
-Share:
-    paperless
-
-Path:
-    /srv/paperless/consume
-
-Scanner user:
-    scanner
-
-Permissions:
-    write-only/minimal practical permissions
+Brother ADS-4300N
+        ↓ SFTP as paperless-scanner
+/srv/paperless-scanner/inbox
+        ↓ closed descriptor + quiet interval
+atomic rename on the /srv subvolume
+        ↓
+/srv/paperless/consume
 ```
 
-The Brother ADS-4300N should be configured through its own web interface with a Scan-to-Network profile.
+The scanner account has no shell, password authentication, forwarding, PTY, or
+access outside its chroot. Its public key is accepted only from the scanner's
+reserved address. The handoff accepts regular PDF files, refuses collisions,
+sets Paperless ownership, and exposes only a complete file to the consumer.
 
 Initial goal:
 
@@ -579,36 +611,38 @@ Preferred workflow:
 ```text
 systemd timer
       ↓
-pre-backup script
+application-native artifact producers
       ↓
-database dumps
+artifact validation
       ↓
-Kopia snapshot
+coherent Kopia snapshot of /srv/backups
       ↓
 Backblaze
 ```
 
-Example database dump destination:
+Implemented service-artifact layout:
 
 ```text
-/srv/backups/database/
-├── invoiceninja.sql.zst
-└── paperless.sql.zst
+/srv/backups/services/
+├── jellyfin/
+│   └── jellyfin-backup-TIMESTAMP.zip
+└── paperless/
+    ├── manifest.json
+    ├── metadata.json
+    └── exported document files
 ```
 
 Kopia should then capture:
 
-* Database dumps
-* Paperless documents/media
-* Invoice Ninja storage
-* Relevant application metadata
-* Other designated persistent state
+* Validated, application-consistent native artifacts
+* Database dumps where an application has no stronger native export contract
+* Required application uploads and metadata
 
 Do not treat a successful upload as proof that backups work.
 
 Create documented restore procedures.
 
-Eventually perform a full restore test.
+Perform isolated artifact restores before applying any backup to a live service.
 
 ---
 
@@ -692,12 +726,15 @@ Use this phase to validate the broader service-module conventions before deployi
 
 ## Phase 4 — Paperless
 
+Status: operational. Deferred profile and recovery checks are listed below and
+do not block Phase 6.
+
 Implement:
 
 * Paperless
 * Database
 * Consumption directory
-* Samba scan share
+* Isolated SFTP scanner staging and atomic handoff
 * Scanner-specific account
 * Brother scanner profile documentation
 
@@ -705,12 +742,17 @@ Success criteria:
 
 * Physical scan reaches Paperless without desktop intervention
 * OCR completes
-* Archived document survives reboot/rebuild
+* Archived document survives rebuild; reboot and restored-document validation
+  remain scheduled acceptance tests
 * Scanner cannot access unrelated server data
 
 ---
 
 ## Phase 5 — Backups
+
+Status: operational. Manual generation, repository verification, and isolated
+artifact restores have succeeded. A natural timer run and retained Paperless
+document restore remain deferred acceptance tests.
 
 Implement:
 
@@ -724,7 +766,7 @@ Implement:
 Success criteria:
 
 * Successful remote snapshot
-* Database dumps included
+* Application-consistent native exports or database dumps included
 * At least one documented test restore succeeds
 
 Critical services should not be migrated until this phase is operational.
@@ -970,16 +1012,15 @@ Audiobookshelf, Moodist, and remote access may remain follow-up work without blo
 
 # 19. Immediate Next Step
 
-Begin with Phase 0 and Phase 1 only.
+Begin Phase 6 with an empty, reproducible Invoice Ninja deployment.
 
 Initial implementation target:
 
-1. Inspect the existing repository.
-2. Establish the flake and host structure.
-3. Create the base NixOS host configuration.
-4. Configure networking and SSH.
-5. Define initial storage conventions.
-6. Verify the configuration evaluates/builds.
-7. Document how the MiniPC will be installed and rebuilt.
+1. Select and pin an upstream Invoice Ninja release.
+2. Reapply the small white-label transformation reproducibly.
+3. Declare the empty application, database, workers, scheduler, reverse proxy,
+   secrets, persistent state, and native backup contract.
+4. Validate the clean deployment independently of existing production data.
 
-Do not begin deploying application services until the base host design is stable.
+Do not begin migration until the clean deployment and its backup path have
+succeeded.

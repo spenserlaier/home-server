@@ -24,9 +24,11 @@ Use these defaults unless a service has a documented reason to differ:
 - Service-private state: `0750`, owned by the service user and group.
 - Secret-bearing directories: `0700`, owned by the consuming service user.
 - Shared read-only data: `0750`, with a narrowly scoped shared group.
-- Deliberate LAN-facing drop directories, such as the scanner consumption
-  directory: permissions designed in that service module rather than made
-  world-writable.
+- Deliberate LAN-facing drop directories: isolate them from application state,
+  constrain their service identity, and use a validated handoff rather than
+  making an application consumption directory world-writable. The Brother
+  scanner is chrooted to `/srv/paperless-scanner/inbox`; a root-owned service
+  atomically moves completed files into Paperless.
 - `/srv` itself: `0755 root:root`; service accounts cannot create arbitrary
   top-level directories.
 

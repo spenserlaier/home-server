@@ -47,15 +47,17 @@ Then create and validate the first generation:
 
 ```console
 sudo systemctl start kopia-backup.service
-sudo systemctl status jellyfin-backup.service kopia-backup.service
+sudo systemctl status \
+  jellyfin-backup.service paperless-exporter.service kopia-backup.service
 sudo journalctl --unit kopia-backup.service --since today
 systemctl list-timers kopia-backup.timer kopia-verify.timer
 ```
 
-`kopia-backup.service` first requires `jellyfin-backup.service`. A failed native
-backup therefore prevents an off-host generation from being reported as
-successful. The standalone Jellyfin timer is disabled to avoid making a second
-archive each day.
+`kopia-backup.service` first requires both `jellyfin-backup.service` and
+`paperless-exporter.service`. A failure in either native artifact producer
+therefore prevents an off-host generation from being reported as successful.
+The standalone producer timers are disabled so Kopia controls the coherent
+generation boundary.
 
 ## Verification
 
@@ -107,6 +109,19 @@ This repeats the same ZIP, manifest, database-history, configuration, and
 backup-option checks used when the archive was created. A successful validation
 proves the artifact survived upload, encryption, remote storage, download,
 decryption, and restoration.
+
+Validate a recovered Paperless export without changing the running service:
+
+```console
+sudo validate-service-paperless-backup \
+  /srv/restore-tests/kopia-YYYYMMDD/services/paperless
+cat /srv/restore-tests/kopia-YYYYMMDD/services/paperless/metadata.json
+```
+
+The export must contain a structurally valid Django manifest and metadata for
+the expected Paperless version. Application-level import must target an empty,
+matching-version Paperless installation; never import it over the live
+database.
 
 Only during disaster recovery or an isolated application-level restore drill
 should the validated artifact be applied to Jellyfin:
