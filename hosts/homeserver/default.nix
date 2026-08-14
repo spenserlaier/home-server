@@ -11,6 +11,7 @@
     ../../modules/backup/jellyfin-native.nix
     ../../modules/backup/kopia.nix
     ../../modules/networking/reverse-proxy.nix
+    ../../modules/services/invoiceshelf.nix
     ../../modules/services/jellyfin.nix
     ../../modules/services/paperless.nix
     ../../modules/services/paperless-scanner.nix
@@ -41,6 +42,7 @@
       prepareUnits = [
         "jellyfin-backup.service"
         "paperless-exporter.service"
+        "invoiceshelf-backup.service"
       ];
     };
   };

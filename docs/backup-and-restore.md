@@ -53,11 +53,11 @@ sudo journalctl --unit kopia-backup.service --since today
 systemctl list-timers kopia-backup.timer kopia-verify.timer
 ```
 
-`kopia-backup.service` first requires both `jellyfin-backup.service` and
-`paperless-exporter.service`. A failure in either native artifact producer
-therefore prevents an off-host generation from being reported as successful.
-The standalone producer timers are disabled so Kopia controls the coherent
-generation boundary.
+`kopia-backup.service` first requires `jellyfin-backup.service`,
+`paperless-exporter.service`, and `invoiceshelf-backup.service`. A failure in
+any artifact producer therefore prevents an off-host generation from being
+reported as successful. The standalone producer timers are disabled so Kopia
+controls the coherent generation boundary.
 
 ## Verification
 
@@ -122,6 +122,20 @@ The export must contain a structurally valid Django manifest and metadata for
 the expected Paperless version. Application-level import must target an empty,
 matching-version Paperless installation; never import it over the live
 database.
+
+Validate a recovered InvoiceShelf artifact without changing the running
+service:
+
+```console
+sudo validate-service-invoiceshelf-backup \
+  /srv/restore-tests/kopia-YYYYMMDD/services/invoiceshelf
+cat /srv/restore-tests/kopia-YYYYMMDD/services/invoiceshelf/metadata.json
+```
+
+The validator checks the compressed MariaDB dump, storage archive paths, and
+pinned application/database image identities. Applying the database dump and
+storage archive is intentionally deferred until an isolated restore procedure
+has been exercised after the empty deployment.
 
 Only during disaster recovery or an isolated application-level restore drill
 should the validated artifact be applied to Jellyfin:

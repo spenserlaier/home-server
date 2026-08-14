@@ -39,8 +39,9 @@ Paperless-document restore, duplex and blank-page scanner profiles, and broader
 reboot/recovery drills. These tests should be combined where practical and do
 not block the next development phase.
 
-The immediate development target is Phase 6: a clean, reproducible Invoice
-Ninja deployment with empty test data. Migration remains Phase 7.
+The immediate development target is Phase 6: deploy and validate the declared
+InvoiceShelf service with empty test data. Migration from Invoice Ninja remains
+Phase 7.
 
 ---
 
@@ -88,24 +89,22 @@ Paperless consumption directory
 OCR / indexing / archive
 ```
 
-### Invoice Ninja
+### InvoiceShelf
 
-Invoice Ninja currently running on another machine with a small white-label
-template modification.
-
-This is business-critical state and should be treated conservatively.
+InvoiceShelf replaces the source-available Invoice Ninja application. The
+existing Invoice Ninja 5.11.43 instance remains the migration source and stays
+operational until the replacement is validated.
 
 Requirements:
 
-* Reapply the small white-label modification reproducibly to a pinned upstream
-  Invoice Ninja release
-* Record the upstream revision and transformation used for each built artifact
-* Prefer OCI container isolation unless there is a compelling reason otherwise
-* NixOS should declaratively control the container
+* Use the fully open-source AGPL-3.0 InvoiceShelf release
+* Pin application and database OCI images by immutable digest
+* NixOS declaratively controls both containers
 * Persistent database and application storage must live outside the container
-* Preserve application secrets, including the Laravel application key
-* Migration must occur only after the new deployment works independently
-* Do not combine migration with database-engine upgrades or other unrelated modernization
+* Generate a new InvoiceShelf Laravel application key; do not reuse Invoice
+  Ninja's key
+* Transform source records rather than restoring the Invoice Ninja database
+* Migration occurs only after the new deployment and backup work independently
 * Preserve rollback path to the existing desktop deployment until validation is complete
 
 ### Pi-hole
@@ -216,7 +215,7 @@ Use containers where containerization materially reduces maintenance complexity.
 
 Likely container candidates include:
 
-* Custom Invoice Ninja fork
+* InvoiceShelf
 * Moodist
 * Potentially Audiobookshelf depending on NixOS module/package quality
 
@@ -242,11 +241,10 @@ Target layout:
 ├── paperless-scanner/
 │   └── inbox/
 │
-├── invoiceninja/
+├── invoiceshelf/
 │   ├── database/
 │   ├── storage/
-│   ├── backups/
-│   └── config/
+│   └── modules/
 │
 ├── jellyfin/
 │   ├── data/
@@ -269,7 +267,8 @@ Target layout:
 ├── backups/
 │   └── services/
 │       ├── jellyfin/
-│       └── paperless/
+│       ├── paperless/
+│       └── invoiceshelf/
 │
 └── restore-tests/
 ```
@@ -288,8 +287,8 @@ Treat storage according to importance.
 
 Examples:
 
-* Invoice Ninja database
-* Invoice Ninja uploads
+* InvoiceShelf database
+* InvoiceShelf storage and modules
 * Paperless database
 * Paperless archived documents
 * Application secrets
@@ -351,7 +350,7 @@ Initial target:
 │   │   ├── jellyfin.nix
 │   │   ├── paperless.nix
 │   │   ├── paperless-scanner.nix
-│   │   ├── invoiceninja.nix
+│   │   ├── invoiceshelf.nix
 │   │   ├── pihole.nix
 │   │   ├── audiobookshelf.nix
 │   │   └── moodist.nix
@@ -375,7 +374,8 @@ Initial target:
     ├── architecture.md
     ├── deployment.md
     ├── backup-and-restore.md
-    ├── invoiceninja-migration.md
+    ├── invoiceshelf.md
+    ├── invoiceninja-to-invoiceshelf-migration.md
     └── paperless-scanner.md
 ```
 
@@ -398,8 +398,8 @@ Secrets may include:
 
 * Backblaze credentials
 * Kopia repository credentials
-* Invoice Ninja application key
-* Invoice Ninja database password
+* InvoiceShelf application key
+* InvoiceShelf database passwords
 * SMTP credentials
 * Paperless secrets
 * Future private-overlay-network credentials
@@ -503,25 +503,16 @@ Do not block the initial deployment on these enhancements.
 
 ---
 
-# 11. Invoice Ninja Deployment Strategy
+# 11. InvoiceShelf Deployment Strategy
 
-Treat Invoice Ninja as an independently versioned application artifact.
-
-The known customization removes the HTML image carrying the
-`invoiceninja-whitelabel-logo` ID. Reconfirm the current upstream templates
-before relying on it; the historical transformation was equivalent to:
-
-```console
-find . -type f -name '*.html' \
-  -exec sed -i '/<img[^>]*id="invoiceninja-whitelabel-logo"[^>]*>/d' {} +
-```
+Treat InvoiceShelf as an independently versioned application artifact. Use the
+upstream AGPL-3.0 image without a source patch. InvoiceShelf 2.4.2 is the pinned
+stable release; 3.x remains prerelease.
 
 Preferred model:
 
 ```text
-custom Invoice Ninja Git revision
-              ↓
-       reproducible OCI image
+InvoiceShelf + MariaDB image digests
               ↓
 NixOS virtualisation.oci-containers
               ↓
@@ -537,30 +528,28 @@ Do not:
 
 Prefer:
 
-* pinned Git revision
 * pinned image tag/digest
-* or Nix-built OCI image from a pinned source
 
-The deployment must make it possible to identify exactly which source revision is currently running.
+The deployment records the exact amd64 application and database manifest
+digests and disables in-application updates.
 
 ---
 
-# 12. Invoice Ninja Migration
+# 12. Invoice Ninja to InvoiceShelf Migration
 
 Migration is a distinct phase.
 
 Before migration, capture:
 
-* Exact running fork revision
+* Exact running Invoice Ninja revision and version
 * Database engine/version
 * Database dump
 * Persistent storage/uploads
-* Application `.env` values
-* Laravel `APP_KEY`
+* Required application configuration and source `APP_KEY`
 * SMTP configuration
 * Scheduled-task configuration
 * Worker/queue configuration
-* Any custom dependencies or build steps
+* The two historical PDF customization locations for provenance only
 
 Migration workflow:
 
@@ -569,9 +558,9 @@ existing desktop instance
         ↓
 capture DB + state + configuration
         ↓
-build clean server deployment
+build clean InvoiceShelf deployment
         ↓
-restore captured data
+transform records and documents
         ↓
 test isolated deployment
         ↓
@@ -584,19 +573,16 @@ retain old deployment temporarily for rollback
 
 Validation should include:
 
-* Authentication
 * Client records
 * Invoice records
-* Attachments
+* Line items, totals, statuses, and payments
+* Attachments or stored documents
 * PDFs
-* Email delivery
-* Recurring invoices if used
 * Scheduler
-* Queue/background jobs
-* Custom fork behavior
-* Existing integrations
+* Branding and numbering
 
-Do not change database engines/major versions during the initial migration unless strictly required.
+Do not restore the Invoice Ninja database into InvoiceShelf. Use an auditable,
+repeatable transformation and reconcile record counts and monetary totals.
 
 ---
 
@@ -626,10 +612,14 @@ Implemented service-artifact layout:
 /srv/backups/services/
 ├── jellyfin/
 │   └── jellyfin-backup-TIMESTAMP.zip
-└── paperless/
+├── paperless/
     ├── manifest.json
     ├── metadata.json
     └── exported document files
+└── invoiceshelf/
+    ├── database.sql.gz
+    ├── storage.tar.zst
+    └── metadata.json
 ```
 
 Kopia should then capture:
@@ -773,36 +763,35 @@ Critical services should not be migrated until this phase is operational.
 
 ---
 
-## Phase 6 — Invoice Ninja clean deployment
+## Phase 6 — InvoiceShelf clean deployment
 
 Implement:
 
-* Reproducible custom fork artifact
-* OCI configuration
-* Database service
+* Digest-pinned InvoiceShelf and MariaDB OCI containers
 * Persistent storage
 * Scheduler
-* Queue worker
 * Reverse proxy
 * Secrets
+* Validated backup producer
 
 Initially use empty/test data.
 
 Success criteria:
 
 * Application runs correctly
-* Custom modifications are present
-* Scheduler and workers operate
+* Branding and PDF generation work
+* Scheduler operates without errors
 * Deployment survives rebuild/reboot
+* Backup artifacts validate after an isolated Kopia restore
 
 ---
 
-## Phase 7 — Invoice Ninja migration
+## Phase 7 — Invoice Ninja to InvoiceShelf migration
 
 Implement:
 
 * Export desktop state
-* Restore into server instance
+* Transform and import into InvoiceShelf
 * Validate application
 * Switch normal use to server
 
@@ -811,8 +800,7 @@ Success criteria:
 * Historical data matches
 * Attachments work
 * Invoice generation works
-* Email works
-* Custom behavior works
+* Line items, totals, statuses, and payments reconcile
 * Backup succeeds after migration
 
 Keep existing instance intact until validation is complete.
@@ -974,7 +962,7 @@ What must exist before the configuration can activate successfully.
 
 How to restore each critical service.
 
-## Invoice Ninja migration
+## Invoice Ninja to InvoiceShelf migration
 
 Exact migration procedure and rollback plan.
 
@@ -998,7 +986,7 @@ The initial home-server project is considered complete when:
 * Persistent state is clearly separated from system configuration
 * Jellyfin is functional
 * Paperless accepts scans directly from the Brother scanner
-* Invoice Ninja custom fork has been successfully migrated
+* Existing Invoice Ninja records have been successfully migrated to InvoiceShelf
 * Pi-hole has replaced the previous Raspberry Pi deployment
 * Kopia backs up critical data to Backblaze
 * At least one meaningful restore test has been performed
@@ -1012,15 +1000,15 @@ Audiobookshelf, Moodist, and remote access may remain follow-up work without blo
 
 # 19. Immediate Next Step
 
-Begin Phase 6 with an empty, reproducible Invoice Ninja deployment.
+Complete Phase 6 with an empty, reproducible InvoiceShelf deployment.
 
 Initial implementation target:
 
-1. Select and pin an upstream Invoice Ninja release.
-2. Reapply the small white-label transformation reproducibly.
-3. Declare the empty application, database, workers, scheduler, reverse proxy,
-   secrets, persistent state, and native backup contract.
-4. Validate the clean deployment independently of existing production data.
+1. Add the three InvoiceShelf secrets to SOPS.
+2. Deploy the digest-pinned InvoiceShelf 2.4.2 and MariaDB 10.11.14 containers.
+3. Complete the setup wizard with empty test data.
+4. Validate branding, PDF generation, persistence, scheduling, backup, and an
+   isolated artifact restore.
 
 Do not begin migration until the clean deployment and its backup path have
 succeeded.

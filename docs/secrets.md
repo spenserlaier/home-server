@@ -102,6 +102,10 @@ kopia:
   b2_application_key: replace-me
 paperless:
   secret_key: replace-me
+invoiceshelf:
+  app_key: replace-me
+  database_password: replace-me
+  database_root_password: replace-me
 ```
 
 On save, SOPS writes only encrypted values plus recipient metadata. Before

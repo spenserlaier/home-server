@@ -17,13 +17,15 @@ Paperless deployment, persistence, exports, and initial verification are
 documented in [docs/paperless.md](./docs/paperless.md).
 Brother scanner SFTP ingestion and verification are documented in
 [docs/paperless-scanner.md](./docs/paperless-scanner.md).
+InvoiceShelf deployment, persistence, backup, and initial verification are
+documented in [docs/invoiceshelf.md](./docs/invoiceshelf.md).
 Encrypted off-host backup initialization, verification, and restore operations
 are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
 
 ## Current scope
 
-This repository currently implements the platform through the Paperless and
-off-host-backup milestones (Phases 0–5):
+This repository implements the platform through the empty InvoiceShelf
+deployment configuration (Phase 6; deployment validation remains):
 
 - NixOS 26.05 on `x86_64-linux`
 - UEFI/systemd-boot
@@ -35,11 +37,12 @@ off-host-backup milestones (Phases 0–5):
 - Jellyfin with hardware transcoding and native backup artifacts
 - Paperless-ngx with PostgreSQL, native exports, and direct scanner ingestion
 - encrypted, immutable off-host Kopia generations in Backblaze B2
+- InvoiceShelf 2.4.2 and MariaDB 10.11.14 pinned by immutable OCI digests
 
-The next major application milestone is a clean, reproducible Invoice Ninja
-deployment. Migration of existing Invoice Ninja state remains a separate later
-step. Pi-hole, operational hardening, remote access, and secondary services are
-also intentionally deferred.
+The next acceptance milestone is deploying and validating InvoiceShelf with
+empty test data. Migration of the existing Invoice Ninja records remains a
+separate later step. Pi-hole, operational hardening, remote access, and
+secondary services are also intentionally deferred.
 
 ## Development checks
 
