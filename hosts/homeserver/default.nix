@@ -12,6 +12,7 @@
     ../../modules/backup/kopia.nix
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/jellyfin.nix
+    ../../modules/services/paperless.nix
   ]
   # Generate this file on the physical machine before its first install. A
   # conditional import keeps remote evaluation possible until then.
@@ -36,7 +37,10 @@
       bucket = "hyrax-home-server";
       endpoint = "s3.us-east-005.backblazeb2.com";
       region = "us-east-005";
-      prepareUnits = [ "jellyfin-backup.service" ];
+      prepareUnits = [
+        "jellyfin-backup.service"
+        "paperless-exporter.service"
+      ];
     };
   };
 
