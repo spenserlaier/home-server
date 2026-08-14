@@ -36,6 +36,7 @@
       bucket = "hyrax-home-server";
       endpoint = "s3.us-east-005.backblazeb2.com";
       region = "us-east-005";
+      prepareUnits = [ "jellyfin-backup.service" ];
     };
   };
 

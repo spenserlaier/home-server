@@ -235,6 +235,18 @@ in
       default = "/srv/backups";
       description = "Staging tree captured as one Kopia generation.";
     };
+    prepareUnits = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [
+        "jellyfin-backup.service"
+        "paperless-exporter.service"
+      ];
+      description = ''
+        Application-consistent artifact producers that must succeed before a
+        Kopia generation is created.
+      '';
+    };
     schedule = lib.mkOption {
       type = lib.types.str;
       default = "*-*-* 04:15:00";
@@ -324,9 +336,9 @@ in
         wants = [ "network-online.target" ];
         after = [
           "network-online.target"
-          "jellyfin-backup.service"
-        ];
-        requires = [ "jellyfin-backup.service" ];
+        ]
+        ++ cfg.prepareUnits;
+        requires = cfg.prepareUnits;
         serviceConfig = commonServiceConfig // {
           ExecStart = lib.getExe createSnapshot;
           RuntimeDirectory = "kopia-backup";

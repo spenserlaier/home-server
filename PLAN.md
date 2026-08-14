@@ -66,14 +66,16 @@ OCR / indexing / archive
 
 ### Invoice Ninja
 
-Custom/modded Invoice Ninja fork currently running on another machine.
+Invoice Ninja currently running on another machine with a small white-label
+template modification.
 
 This is business-critical state and should be treated conservatively.
 
 Requirements:
 
-* Run the existing custom fork rather than upstream Invoice Ninja
-* Exact source revision must be reproducible/pinned
+* Reapply the small white-label modification reproducibly to a pinned upstream
+  Invoice Ninja release
+* Record the upstream revision and transformation used for each built artifact
 * Prefer OCI container isolation unless there is a compelling reason otherwise
 * NixOS should declaratively control the container
 * Persistent database and application storage must live outside the container
@@ -472,6 +474,15 @@ Do not block the initial deployment on these enhancements.
 # 11. Invoice Ninja Deployment Strategy
 
 Treat Invoice Ninja as an independently versioned application artifact.
+
+The known customization removes the HTML image carrying the
+`invoiceninja-whitelabel-logo` ID. Reconfirm the current upstream templates
+before relying on it; the historical transformation was equivalent to:
+
+```console
+find . -type f -name '*.html' \
+  -exec sed -i '/<img[^>]*id="invoiceninja-whitelabel-logo"[^>]*>/d' {} +
+```
 
 Preferred model:
 
