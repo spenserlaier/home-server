@@ -9,6 +9,7 @@
     ../../modules/base/server.nix
     ../../modules/base/users.nix
     ../../modules/backup/jellyfin-native.nix
+    ../../modules/backup/kopia.nix
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/jellyfin.nix
   ]
@@ -24,7 +25,19 @@
     enableDnsChallenge = true;
   };
 
-  homelab.backup.jellyfin.enable = true;
+  homelab.backup = {
+    jellyfin = {
+      enable = true;
+      # Kopia starts this unit immediately before each coherent generation.
+      enableTimer = false;
+    };
+    kopia = {
+      enable = true;
+      bucket = "hyrax-home-server";
+      endpoint = "s3.us-east-005.backblazeb2.com";
+      region = "us-east-005";
+    };
+  };
 
   nixpkgs.hostPlatform = "x86_64-linux";
 

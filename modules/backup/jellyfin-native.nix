@@ -179,6 +179,11 @@ in
       default = 7;
       description = "Days of validated Jellyfin archives to retain locally.";
     };
+    enableTimer = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Run Jellyfin backups independently instead of as a whole-host pre-backup unit.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -229,7 +234,7 @@ in
       };
     };
 
-    systemd.timers.jellyfin-backup = {
+    systemd.timers.jellyfin-backup = lib.mkIf cfg.enableTimer {
       description = "Daily native Jellyfin backup";
       wantedBy = [ "timers.target" ];
       timerConfig = {

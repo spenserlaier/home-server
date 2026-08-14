@@ -96,7 +96,7 @@ Requirements:
 
 ### Backups
 
-Use Kopia with the existing Backblaze B2/S3-compatible repository.
+Use Kopia with a dedicated Backblaze B2/S3-compatible repository for this host.
 
 Requirements:
 
@@ -559,7 +559,7 @@ Do not change database engines/major versions during the initial migration unles
 
 # 13. Backup Strategy
 
-Use Kopia and the existing Backblaze repository.
+Use Kopia and a dedicated Backblaze repository for this host.
 
 Backups should include application-consistent database data.
 
