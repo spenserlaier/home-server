@@ -88,7 +88,6 @@ in
       settings = {
         PAPERLESS_ADMIN_USER = "admin";
         PAPERLESS_ALLOWED_HOSTS = hostName;
-        PAPERLESS_OCR_LANGUAGE = "eng";
       };
     };
 
