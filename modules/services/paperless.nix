@@ -118,7 +118,7 @@ in
       group = "paperless";
       mode = "0400";
       content = ''
-        PAPERLESS_SECRET_KEY=${config.sops.placeholder."paperless/secret_key"}
+        PAPERLESS_SECRET_KEY=${lib.escapeShellArg config.sops.placeholder."paperless/secret_key"}
       '';
     };
   };
