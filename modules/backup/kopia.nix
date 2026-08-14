@@ -19,6 +19,12 @@ let
   repositoryArguments = ''
     --bucket=${lib.escapeShellArg cfg.bucket} \
     --endpoint=${lib.escapeShellArg cfg.endpoint} \
+    --region=${lib.escapeShellArg cfg.region}
+  '';
+
+  repositoryCreationArguments = ''
+    --bucket=${lib.escapeShellArg cfg.bucket} \
+    --endpoint=${lib.escapeShellArg cfg.endpoint} \
     --region=${lib.escapeShellArg cfg.region} \
     --retention-mode=${lib.escapeShellArg cfg.objectLock.mode} \
     --retention-period=${lib.escapeShellArg cfg.objectLock.period}
@@ -132,7 +138,7 @@ let
       ${credentialEnvironment}
 
       kopia --config-file=${repositoryConfig} repository create s3 \
-        ${repositoryArguments}
+        ${repositoryCreationArguments}
 
       kopia --config-file=${repositoryConfig} policy set ${lib.escapeShellArg cfg.source} \
         --manual \
