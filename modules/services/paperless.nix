@@ -123,6 +123,8 @@ in
     };
   };
 
+  users.users.paperless.extraGroups = [ "homelab-backup" ];
+
   systemd = {
     tmpfiles.settings."00-homelab-paperless" = {
       ${paperlessRoot}.d = {

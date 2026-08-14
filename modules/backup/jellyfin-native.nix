@@ -223,13 +223,10 @@ in
     };
 
     systemd.tmpfiles.rules = [
-      "d /srv/backups 0750 root homelab-backup - -"
-      "d /srv/backups/services 0750 root homelab-backup - -"
       "d ${archiveDir} 0700 jellyfin jellyfin - -"
       "d ${nativeBackupDir} 0700 jellyfin jellyfin - -"
     ];
 
-    users.groups.homelab-backup = { };
     users.users.jellyfin.extraGroups = [ "homelab-backup" ];
 
     systemd.services.jellyfin-backup = {

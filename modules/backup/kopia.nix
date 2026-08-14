@@ -302,6 +302,8 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    users.groups.homelab-backup = { };
+
     sops.secrets = {
       "kopia/repository_password" = {
         sopsFile = ../../secrets/homeserver.yaml;
@@ -317,7 +319,11 @@ in
       };
     };
 
-    systemd.tmpfiles.rules = [ "d ${restoreRoot} 0700 root root - -" ];
+    systemd.tmpfiles.rules = [
+      "d ${cfg.source} 0750 root homelab-backup - -"
+      "d ${cfg.source}/services 0750 root homelab-backup - -"
+      "d ${restoreRoot} 0700 root root - -"
+    ];
 
     systemd.services = {
       kopia-repository-init = {
