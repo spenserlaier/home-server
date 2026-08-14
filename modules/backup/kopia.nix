@@ -6,12 +6,13 @@
 }:
 let
   cfg = config.homelab.backup.kopia;
-  repositoryConfig = "$RUNTIME_DIRECTORY/repository.config";
+  repositoryConfig = ''"$RUNTIME_DIRECTORY/repository.config"'';
 
   credentialEnvironment = ''
-    export KOPIA_PASSWORD="$(<"$CREDENTIALS_DIRECTORY/repository-password")"
-    export AWS_ACCESS_KEY_ID="$(<"$CREDENTIALS_DIRECTORY/access-key-id")"
-    export AWS_SECRET_ACCESS_KEY="$(<"$CREDENTIALS_DIRECTORY/secret-access-key")"
+    KOPIA_PASSWORD="$(<"$CREDENTIALS_DIRECTORY/repository-password")"
+    AWS_ACCESS_KEY_ID="$(<"$CREDENTIALS_DIRECTORY/access-key-id")"
+    AWS_SECRET_ACCESS_KEY="$(<"$CREDENTIALS_DIRECTORY/secret-access-key")"
+    export KOPIA_PASSWORD AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
   '';
 
   repositoryArguments = ''
