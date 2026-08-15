@@ -8,8 +8,8 @@ in
     example = "192.168.1.0/24";
     description = ''
       Trusted LAN IPv4 subnet allowed to reach home-server network services.
-      Future overlay VPN ranges must be admitted separately rather than folded
-      into this physical-LAN boundary.
+      This must match the routed prefix, not merely the server's first three
+      address octets. Future overlay VPN ranges must be admitted separately.
     '';
   };
 

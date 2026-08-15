@@ -26,7 +26,9 @@
 
   networking.hostName = "homeserver";
 
-  homelab.firewall.lanIPv4Subnet = "192.168.4.0/24";
+  # Eero's routed LAN is a /22; clients may use 192.168.4.x through
+  # 192.168.7.x even though the server itself is 192.168.4.22.
+  homelab.firewall.lanIPv4Subnet = "192.168.4.0/22";
 
   homelab.reverseProxy = {
     enable = true;

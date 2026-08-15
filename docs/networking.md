@@ -93,8 +93,8 @@ backup data.
 
 The router remains the perimeter firewall, with no IPv4 port forwards or IPv6
 firewall exceptions for the homeserver. The host independently permits its
-network services only when the source address belongs to the declared physical
-LAN subnet, currently `192.168.4.0/24`:
+network services only when the source address belongs to the routed physical
+LAN subnet, currently `192.168.4.0/22`:
 
 ```text
 TCP 22       SSH administration
@@ -103,24 +103,23 @@ TCP 80       HTTPS redirects
 TCP/UDP 443  Caddy HTTPS and HTTP/3
 ```
 
+The `/22` prefix is significant: eero clients can use `192.168.4.x` through
+`192.168.7.x`. Do not infer a `/24` from the server's `192.168.4.22` address.
+The deployed server route is authoritative and can be checked with:
+
+```console
+ip -4 address show dev enp1s0
+ip -4 route show 192.168.4.0/22
+```
+
 The global NixOS allowed-port lists remain empty. The source-qualified rules
 have no IPv6 equivalent, so new IPv6 connections to these services are denied.
 Loopback application listeners and established outbound connections are not
 affected.
 
-Before activating a subnet change, confirm that the administrative client
-routes directly to the server and has an address inside the declared subnet:
-
-```console
-# macOS
-route -n get 192.168.4.22
-
-# Linux
-ip route get 192.168.4.22
-```
-
-Use a test activation for firewall changes so a reboot returns to the previous
-boot configuration if SSH access is unexpectedly lost:
+Before activation, confirm that each administrative client has an address
+inside `192.168.4.0/22`. Use a test activation so a reboot returns to the
+previous boot configuration if SSH access is unexpectedly lost:
 
 ```console
 sudo nixos-rebuild test --flake .#homeserver
@@ -134,7 +133,7 @@ An eventual NetBird deployment will introduce a separate overlay interface and
 address range. Add narrowly scoped rules for the required ports from NetBird's
 actual client subnet at that time. Do not add commercial VPN exit ranges:
 Mullvad local-network sharing routes LAN traffic directly, so the server sees
-the client's `192.168.4.x` address rather than a Mullvad exit address.
+the client's LAN address rather than a Mullvad exit address.
 
 If rollback is required while the test configuration is active, reboot from a
 local console or use the still-open administrative session:
