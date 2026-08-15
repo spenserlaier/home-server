@@ -59,11 +59,6 @@ in
       };
     };
 
-    networking.firewall = {
-      allowedTCPPorts = [ 80 ] ++ lib.optional cfg.enableDnsChallenge 443;
-      allowedUDPPorts = lib.optional cfg.enableDnsChallenge 443;
-    };
-
     sops = lib.mkIf cfg.enableDnsChallenge {
       defaultSopsFile = ../../secrets/homeserver.yaml;
       secrets = {

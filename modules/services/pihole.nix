@@ -135,11 +135,6 @@ in
       reverse_proxy 127.0.0.1:${toString webPort}
     '';
 
-    networking.firewall = {
-      allowedTCPPorts = [ 53 ];
-      allowedUDPPorts = [ 53 ];
-    };
-
     sops = {
       secrets."pihole/admin_password" = {
         sopsFile = ../../secrets/homeserver.yaml;

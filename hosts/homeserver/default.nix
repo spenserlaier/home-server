@@ -26,6 +26,8 @@
 
   networking.hostName = "homeserver";
 
+  homelab.firewall.lanIPv4Subnet = "192.168.4.0/24";
+
   homelab.reverseProxy = {
     enable = true;
     baseDomain = "home.hyrax.fyi";
