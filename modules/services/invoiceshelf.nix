@@ -259,6 +259,9 @@ in
       # The upstream image runs as www-data with uid/gid 82 and refuses
       # writable bind mounts owned by another identity.
       "d ${storageDir} 0750 82 82 - -"
+      "d ${storageDir}/app 0750 82 82 - -"
+      "d ${storageDir}/app/templates 0750 82 82 - -"
+      "d ${storageDir}/app/templates/pdf 0750 82 82 - -"
       "d ${modulesDir} 0750 82 82 - -"
       "d ${databaseDir} 0700 root root - -"
       "d ${exportDir} 0700 root root - -"

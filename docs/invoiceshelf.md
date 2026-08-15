@@ -28,7 +28,9 @@ recreation. Container layers are disposable. Do not copy source code, caches,
 or generated frontend bundles from the old Invoice Ninja installation into
 these paths. The application image runs as numeric uid/gid 82, so the module
 declaratively assigns both `storage` and `modules` to `82:82`; the database
-container manages ownership of its own data directory.
+container manages ownership of its own data directory. The module also creates
+`storage/app/templates/pdf`, which InvoiceShelf requires while caching views
+but its container entrypoint does not create on a fresh bind mount.
 
 ## Secrets
 
