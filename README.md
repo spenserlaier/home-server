@@ -21,6 +21,8 @@ InvoiceShelf deployment, persistence, backup, and initial verification are
 documented in [docs/invoiceshelf.md](./docs/invoiceshelf.md).
 Encrypted off-host backup initialization, verification, and restore operations
 are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
+Local failure, backup-freshness, capacity, and SMART monitoring are documented
+in [docs/operational-monitoring.md](./docs/operational-monitoring.md).
 
 ## Current scope
 
