@@ -261,18 +261,21 @@ in
         restartUnits = [ "podman-${appContainer}.service" ];
         content = ''
           # Podman's env-file parser preserves shell quote characters. Laravel
-          # keys use an env-file-safe base64 alphabet, so render this value raw.
+          # keys and the generated database passwords use an env-file-safe
+          # base64 alphabet, so render these values raw.
           APP_KEY=${config.sops.placeholder."invoiceshelf/app_key"}
-          DB_PASSWORD=${lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_password"}
+          DB_PASSWORD=${config.sops.placeholder."invoiceshelf/database_password"}
         '';
       };
       "invoiceshelf-database.env" = {
         mode = "0400";
+        restartUnits = [
+          "podman-${databaseContainer}.service"
+          "podman-${appContainer}.service"
+        ];
         content = ''
-          MARIADB_PASSWORD=${lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_password"}
-          MARIADB_ROOT_PASSWORD=${
-            lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_root_password"
-          }
+          MARIADB_PASSWORD=${config.sops.placeholder."invoiceshelf/database_password"}
+          MARIADB_ROOT_PASSWORD=${config.sops.placeholder."invoiceshelf/database_root_password"}
         '';
       };
     };

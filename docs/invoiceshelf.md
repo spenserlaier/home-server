@@ -59,6 +59,9 @@ openssl rand -base64 32 | sed 's/^/base64:/'
 
 The stored `app_key` must include the literal `base64:` prefix and should be 51
 characters long. Do not wrap quote characters into the secret value.
+Database passwords should be the raw base64 output from `openssl rand -base64
+32`, without a `base64:` prefix or surrounding quote characters. This alphabet
+is safe for Podman's environment-file parser.
 
 Do not reuse the Invoice Ninja `APP_KEY`: InvoiceShelf is a different
 application and its migrated records will be transformed rather than restored
