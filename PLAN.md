@@ -25,7 +25,7 @@ The implementation should favor understandable, boring infrastructure over unnec
 
 ## Current implementation status
 
-Phases 0–6 are operational. The host, persistent-state conventions, SOPS
+Phases 0–7 are operational. The host, persistent-state conventions, SOPS
 secrets, private Caddy endpoints, Jellyfin, Paperless, direct Brother scanner
 ingestion, native service exports, and encrypted off-host Kopia generations
 have all been deployed and exercised.
@@ -40,11 +40,10 @@ reboot/recovery drills. These tests should be combined where practical and do
 not block the next development phase.
 
 InvoiceShelf 2.4.2 and MariaDB 10.11.14 are deployed by immutable OCI digest.
-Empty-instance customer, invoice, PDF, persistence, validated backup, coherent
-Kopia upload, and isolated artifact-restore tests have succeeded. Phase 7's
-narrow Invoice Ninja record import is complete and its aggregate records and
-statuses reconcile. A migrated PDF spot check and fresh post-migration backup
-remain before the source instance is retired.
+The clean deployment, migration, representative PDF and total checks, fresh
+post-migration Kopia backup, and recovered-artifact validation have succeeded.
+InvoiceShelf is now in live use while the intact Invoice Ninja instance remains
+available as a fallback; there is no immediate retirement deadline.
 
 ---
 
@@ -156,6 +155,53 @@ Requirements:
 * Low operational priority
 * Containerization is acceptable/preferred if upstream deployment is container-oriented
 * Avoid spending significant effort producing native Nix packaging unless it clearly improves maintainability
+
+### Finance and subscription tracking
+
+Wallos and Actual Budget are candidates, but selection and scope remain under
+research. Treat financial data as sensitive application state even if the
+service is LAN-only.
+
+Evaluation should cover:
+
+* Subscription tracking versus full budgeting/accounting needs
+* Import/export quality and avoidance of application lock-in
+* Authentication, update cadence, and upstream maintenance health
+* Database-consistent backup and practical restoration
+* Whether bank synchronization or other outbound integrations are desirable
+
+### Service dashboard
+
+Consider a small LAN-only landing page for links to local services. Prefer a
+declarative, low-state dashboard that does not become a second authentication
+layer or receive credentials for the services it links to.
+
+### Desktop AI and document/media workflows
+
+Potential workflows may combine server-hosted data and orchestration with
+desktop GPU inference:
+
+* Analyze selected Paperless documents with a local desktop LLM
+* Run [Lightnovel Crawler](https://github.com/lncrawl/lightnovel-crawler) or a
+  similar fetch/conversion job on the mini-PC
+* Pass prepared text to a local desktop TTS engine such as Qwen TTS
+* Store completed audiobooks in a library served by Audiobookshelf
+
+These are exploratory. Before implementation, define explicit data boundaries,
+least-privilege access to Paperless, temporary-file cleanup, job handoff between
+hosts, compute/storage requirements, provenance, and applicable site terms or
+copyright constraints. Prefer keeping GPU-heavy inference on the desktop unless
+the server hardware is demonstrably suitable.
+
+### Print-and-archive workflow
+
+Investigate a CUPS workflow that sends a physical print while also delivering a
+PDF copy to Paperless. Standard printer classes should not be assumed to mirror
+every job; the design may require a dedicated virtual queue/backend or a
+client-side action. The home server only needs to participate if it hosts that
+queue, converts/spools documents, or provides the Paperless handoff. Preserve
+print privacy, avoid duplicate ingestion, and ensure physical printing does not
+depend on Paperless availability.
 
 ### Private overlay networking
 
@@ -791,8 +837,10 @@ Success criteria:
 
 ## Phase 7 — Invoice Ninja to InvoiceShelf migration
 
-Status: imported and reconciled on August 14, 2026. Final PDF and
-post-migration backup checks remain before retiring the source instance.
+Status: operational. The import, reconciliation, representative PDF and total
+checks, fresh post-migration Kopia backup, and recovered-artifact validation are
+complete. InvoiceShelf is in live use while Invoice Ninja remains available as
+a fallback with no immediate retirement deadline.
 
 Implement:
 
@@ -810,6 +858,22 @@ Success criteria:
 * Backup succeeds after migration
 
 Keep existing instance intact until validation is complete.
+
+---
+
+## Pre-Phase 8 — Operational safety slice
+
+Complete a deliberately small hardening pass before migrating LAN DNS:
+
+* Backup and service-timer failure notifications
+* Disk-space alerts
+* SMART/storage-health monitoring
+* Confirmation of naturally scheduled backup execution
+* The retained Paperless-document restore and broader reboot/recovery checks
+
+Keep this proportional to a single home server. It should establish actionable
+failure visibility without introducing a monitoring platform more complex than
+the services being monitored.
 
 ---
 
@@ -1000,21 +1064,14 @@ The initial home-server project is considered complete when:
 * No core service requires public WAN exposure
 * Required manual recovery steps are documented
 
-Audiobookshelf, Moodist, and remote access may remain follow-up work without blocking completion.
+Audiobookshelf, Moodist, finance/subscription tracking, the service dashboard,
+desktop AI/media workflows, print-and-archive, and remote access may remain
+follow-up work without blocking completion.
 
 ---
 
 # 19. Immediate Next Step
 
-Complete Phase 6 with an empty, reproducible InvoiceShelf deployment.
-
-Initial implementation target:
-
-1. Add the three InvoiceShelf secrets to SOPS.
-2. Deploy the digest-pinned InvoiceShelf 2.4.2 and MariaDB 10.11.14 containers.
-3. Complete the setup wizard with empty test data.
-4. Validate branding, PDF generation, persistence, scheduling, backup, and an
-   isolated artifact restore.
-
-Do not begin migration until the clean deployment and its backup path have
-succeeded.
+Complete the pre-Phase 8 operational safety slice, then begin the staged Pi-hole
+migration. Start with backup/service failure notifications, disk-space alerts,
+and SMART monitoring; keep the implementation small and directly actionable.

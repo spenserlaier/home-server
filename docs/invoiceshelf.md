@@ -162,6 +162,7 @@ reconciled with the source. Deleted source records were deliberately omitted.
 No source document bundle was required because the migration goal is historical
 record tracking; InvoiceShelf regenerates PDFs from the imported records.
 
-Keep the Invoice Ninja 5.11.43 instance intact until representative migrated
-invoice totals and PDFs have been checked and a fresh post-migration backup has
-succeeded.
+Representative migrated invoice totals and PDFs have been checked, and a fresh
+post-migration Kopia backup and recovered artifact have been validated.
+InvoiceShelf is now in live use. The intact Invoice Ninja 5.11.43 instance
+remains available as a fallback, with no immediate retirement deadline.

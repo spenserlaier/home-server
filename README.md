@@ -24,8 +24,8 @@ are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
 
 ## Current scope
 
-This repository implements and validates the platform through the empty
-InvoiceShelf deployment (Phase 6):
+This repository implements and validates the platform through the InvoiceShelf
+migration (Phase 7):
 
 - NixOS 26.05 on `x86_64-linux`
 - UEFI/systemd-boot
@@ -41,11 +41,11 @@ InvoiceShelf deployment (Phase 6):
 
 InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent
 off-host backup, isolated Kopia restoration, and recovered-artifact validation.
-The narrow Invoice Ninja migration is imported and its customer, invoice, line
-item, payment, and status counts reconcile. A post-migration PDF spot check and
-fresh backup remain before retiring the old instance. Pi-hole, operational
-hardening, remote access, and secondary services are also intentionally
-deferred.
+The narrow Invoice Ninja migration is reconciled, representative PDFs and totals
+have been validated, and a fresh post-migration backup has succeeded.
+InvoiceShelf is in live use while Invoice Ninja remains available as a fallback.
+The next milestone is a small operational-safety pass followed by staged Pi-hole
+migration. Remote access and secondary services remain intentionally deferred.
 
 ## Development checks
 
