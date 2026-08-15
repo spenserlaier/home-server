@@ -30,8 +30,9 @@ acknowledge its exact key with `sudo clear-homelab-alert ALERT_KEY`.
 
 The NixOS ntfy service listens only on `127.0.0.1:2586`; Caddy exposes it as the
 private HTTPS endpoint `ntfy.home.hyrax.fyi`. Anonymous access is denied. An
-idempotent bootstrap service reconciles two SOPS-managed accounts and their
-single-topic permissions on every deployment:
+idempotent bootstrap service runs after ntfy has initialized its authentication
+database, then reconciles two SOPS-managed accounts and their single-topic
+permissions on every deployment:
 
 * `homelab-monitoring` can publish but cannot subscribe.
 * `spenser-phone` can subscribe but cannot publish.

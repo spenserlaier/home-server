@@ -14,10 +14,26 @@ let
 
   bootstrapNtfy = pkgs.writeShellApplication {
     name = "bootstrap-ntfy";
-    runtimeInputs = [ config.services.ntfy-sh.package ];
+    runtimeInputs = [
+      pkgs.coreutils
+      config.services.ntfy-sh.package
+    ];
     text = ''
       ntfy() {
         command ntfy "$1" --config /etc/ntfy/server.yml "''${@:2}"
+      }
+
+      ready=false
+      for _ in $(seq 1 30); do
+        if ntfy user list >/dev/null 2>&1; then
+          ready=true
+          break
+        fi
+        sleep 1
+      done
+      [[ "$ready" == true ]] || {
+        echo "ntfy authentication database did not become ready within 30 seconds" >&2
+        exit 1
       }
 
       NTFY_PASSWORD="$(<"$CREDENTIALS_DIRECTORY/publisher-password")"
@@ -256,8 +272,9 @@ in
   systemd.services = {
     ntfy-bootstrap = {
       description = "Reconcile ntfy users and topic permissions";
-      requiredBy = [ "ntfy-sh.service" ];
-      before = [ "ntfy-sh.service" ];
+      wantedBy = [ "multi-user.target" ];
+      requires = [ "ntfy-sh.service" ];
+      after = [ "ntfy-sh.service" ];
       serviceConfig = {
         Type = "oneshot";
         User = config.services.ntfy-sh.user;

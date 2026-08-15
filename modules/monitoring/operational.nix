@@ -204,10 +204,10 @@ in
 
       systemd.services = {
         "homelab-unit-failure@" = {
-          description = "Record failure of %I";
+          description = "Record failure of %i";
           serviceConfig = {
             Type = "oneshot";
-            ExecStart = "${lib.getExe unitFailure} %I";
+            ExecStart = "${lib.getExe unitFailure} %i";
           };
         };
 
