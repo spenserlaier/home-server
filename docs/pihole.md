@@ -23,8 +23,11 @@ forward port 53, 80, or 443 from the internet.
 
 Nix declares the image version, upstream resolvers, local records, listener
 behavior, database retention, disabled ancillary services, and dashboard
-route. SOPS supplies the generated admin password through a read-only runtime
-file; the value does not enter the Nix store or container environment.
+route. SOPS supplies the generated admin password through a root-only runtime
+environment file; the value does not enter the Nix store or repository. Pi-hole
+receives it as the upstream-supported `FTLCONF_webserver_api_password`
+environment setting, which prevents the container from generating a random
+password at startup.
 
 The initial upstreams are Cloudflare's `1.1.1.1` and `1.0.0.1`. Change
 `homelab.pihole.upstreams` in the host configuration if a different upstream is

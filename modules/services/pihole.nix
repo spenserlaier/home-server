@@ -118,12 +118,9 @@ in
             FTLCONF_webserver_domain = hostName;
             FTLCONF_webserver_port = "80";
             FTLCONF_database_maxDBdays = "30";
-            WEBPASSWORD_FILE = "/run/secrets/pihole-admin-password";
           };
-          volumes = [
-            "${stateDir}:/etc/pihole"
-            "${config.sops.secrets."pihole/admin_password".path}:/run/secrets/pihole-admin-password:ro"
-          ];
+          environmentFiles = [ config.sops.templates."pihole.env".path ];
+          volumes = [ "${stateDir}:/etc/pihole" ];
           ports = [
             "${cfg.lanAddress}:53:53/tcp"
             "${cfg.lanAddress}:53:53/udp"
@@ -143,10 +140,17 @@ in
       allowedUDPPorts = [ 53 ];
     };
 
-    sops.secrets."pihole/admin_password" = {
-      sopsFile = ../../secrets/homeserver.yaml;
-      mode = "0400";
-      restartUnits = [ "podman-${containerName}.service" ];
+    sops = {
+      secrets."pihole/admin_password" = {
+        sopsFile = ../../secrets/homeserver.yaml;
+      };
+      templates."pihole.env" = {
+        mode = "0400";
+        restartUnits = [ "podman-${containerName}.service" ];
+        content = ''
+          FTLCONF_webserver_api_password=${config.sops.placeholder."pihole/admin_password"}
+        '';
+      };
     };
 
     systemd = {
