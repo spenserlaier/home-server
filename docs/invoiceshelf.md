@@ -51,6 +51,9 @@ a trusted machine. One suitable key command is:
 openssl rand -base64 32 | sed 's/^/base64:/'
 ```
 
+The stored `app_key` must include the literal `base64:` prefix and should be 51
+characters long. Do not wrap quote characters into the secret value.
+
 Do not reuse the Invoice Ninja `APP_KEY`: InvoiceShelf is a different
 application and its migrated records will be transformed rather than restored
 directly into its database.

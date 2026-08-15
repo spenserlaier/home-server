@@ -239,7 +239,9 @@ in
       "invoiceshelf.env" = {
         mode = "0400";
         content = ''
-          APP_KEY=${lib.escapeShellArg config.sops.placeholder."invoiceshelf/app_key"}
+          # Podman's env-file parser preserves shell quote characters. Laravel
+          # keys use an env-file-safe base64 alphabet, so render this value raw.
+          APP_KEY=${config.sops.placeholder."invoiceshelf/app_key"}
           DB_PASSWORD=${lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_password"}
         '';
       };
