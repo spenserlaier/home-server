@@ -28,11 +28,19 @@ let
     text = ''
       local_answer=""
       external_answer=""
+      leaked_answer=""
       for _ in $(seq 1 30); do
         if local_answer="$(dig +short +time=1 +tries=1 \
           @${lib.escapeShellArg cfg.lanAddress} ${lib.escapeShellArg hostName} A 2>/dev/null)" \
           && grep --fixed-strings --line-regexp ${lib.escapeShellArg cfg.lanAddress} \
             <<<"$local_answer" >/dev/null \
+          && leaked_answer="$({
+            dig +short +time=1 +tries=1 \
+              @${lib.escapeShellArg cfg.lanAddress} ${lib.escapeShellArg hostName} CNAME
+            dig +short +time=1 +tries=1 \
+              @${lib.escapeShellArg cfg.lanAddress} ${lib.escapeShellArg hostName} HTTPS
+          } 2>/dev/null)" \
+          && [[ -z "$leaked_answer" ]] \
           && external_answer="$(dig +short +time=1 +tries=1 \
             @${lib.escapeShellArg cfg.lanAddress} example.com A 2>/dev/null)" \
           && [[ -n "$external_answer" ]]; then
@@ -44,6 +52,7 @@ let
 
       echo "Pi-hole DNS did not become healthy within 60 seconds" >&2
       echo "Expected ${hostName} to resolve to ${cfg.lanAddress}; received: ''${local_answer:-no answer}" >&2
+      [[ -z "$leaked_answer" ]] || echo "Private-zone CNAME/HTTPS data leaked upstream: $leaked_answer" >&2
       [[ -n "$external_answer" ]] || echo "The external test name did not resolve" >&2
       exit 1
     '';
@@ -99,6 +108,9 @@ in
             FTLCONF_dns_domain_name = "home.arpa";
             FTLCONF_dns_domain_local = "true";
             FTLCONF_dns_domainNeeded = "true";
+            # Prevent non-address queries such as HTTPS/SVCB from escaping to
+            # Porkbun's public parking wildcard.
+            FTLCONF_misc_dnsmasq_lines = "local=/${domain}/";
             FTLCONF_dhcp_active = "false";
             FTLCONF_ntp_ipv4_active = "false";
             FTLCONF_ntp_ipv6_active = "false";

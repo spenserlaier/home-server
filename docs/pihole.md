@@ -46,6 +46,12 @@ homeserver.home.arpa -> 192.168.4.22
 scanner.home.arpa    -> 192.168.4.38
 ```
 
+The entire `home.hyrax.fyi` suffix is also declared local-authoritative. This is
+required in addition to A records: modern clients query HTTPS/SVCB and other
+record types, and an unknown type must receive a local empty answer rather than
+being forwarded to Porkbun's public parking wildcard. The recurring DNS check
+verifies that CNAME and HTTPS queries do not leak upstream.
+
 ## Staged deployment
 
 Keep the existing Raspberry Pi resolver available throughout the test-client
