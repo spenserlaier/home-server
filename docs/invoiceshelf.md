@@ -90,6 +90,16 @@ test data. The declared database connection is already supplied to the
 container; do not create a second database or switch database engines in the
 wizard.
 
+Outbound email is deliberately deferred. The container declares Laravel's
+`log` mail transport under both the legacy `MAIL_DRIVER` and current
+`MAIL_MAILER` names, with `InvoiceShelf <noreply@invoices.home.hyrax.fyi>` as a
+syntactically valid non-delivery sender. The setup wizard does not offer `log`;
+select `mail` there only to satisfy its allow-list and enter the declared sender
+name/address. The container environment takes precedence over the wizard's
+`.env` value after the declarative configuration is activated. Messages are not
+delivered; do not use the application's send action until a real mail provider
+has been configured and tested.
+
 ## Empty-deployment acceptance
 
 Before writing migration tooling, verify:

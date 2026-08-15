@@ -224,6 +224,13 @@ in
             AUTORUN_LARAVEL_OPTIMIZE = "false";
             PHP_OPCACHE_ENABLE = "1";
             TIMEZONE = "America/New_York";
+            # Outbound email is deliberately deferred. InvoiceShelf 2.x names
+            # this setting MAIL_DRIVER while current Laravel uses MAIL_MAILER;
+            # set both to the non-delivery log transport.
+            MAIL_DRIVER = "log";
+            MAIL_MAILER = "log";
+            MAIL_FROM_NAME = "InvoiceShelf";
+            MAIL_FROM_ADDRESS = "noreply@${hostName}";
           };
           environmentFiles = [ config.sops.templates."invoiceshelf.env".path ];
           volumes = [
