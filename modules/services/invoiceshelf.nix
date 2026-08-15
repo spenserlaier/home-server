@@ -238,6 +238,7 @@ in
     templates = {
       "invoiceshelf.env" = {
         mode = "0400";
+        restartUnits = [ "podman-${appContainer}.service" ];
         content = ''
           # Podman's env-file parser preserves shell quote characters. Laravel
           # keys use an env-file-safe base64 alphabet, so render this value raw.
