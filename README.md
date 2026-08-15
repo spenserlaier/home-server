@@ -25,6 +25,9 @@ Local failure, backup-freshness, capacity, and SMART monitoring are documented
 in [docs/operational-monitoring.md](./docs/operational-monitoring.md).
 Pi-hole deployment, staged client migration, and rollback are documented in
 [docs/pihole.md](./docs/pihole.md).
+The household portal, non-administrator application accounts, sharing policy,
+and guest-network acceptance checks are documented in
+[docs/household-access.md](./docs/household-access.md).
 
 ## Current scope
 
@@ -45,6 +48,7 @@ migration (Phase 7):
 - durable local alerts with LAN-only ntfy push delivery and hosted
   Healthchecks.io dead-man monitoring
 - a declarative Pi-hole resolver ready for staged test-client migration
+- a private household portal at `home.hyrax.fyi`
 
 InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent
 off-host backup, isolated Kopia restoration, and recovered-artifact validation.

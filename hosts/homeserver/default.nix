@@ -14,6 +14,7 @@
     ../../modules/monitoring/operational.nix
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/invoiceshelf.nix
+    ../../modules/services/home-portal.nix
     ../../modules/services/jellyfin.nix
     ../../modules/services/paperless.nix
     ../../modules/services/paperless-scanner.nix

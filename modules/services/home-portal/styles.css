@@ -1,0 +1,249 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  color: #282620;
+  background: #f3eee5;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 18rem;
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 14% 8%, rgb(255 255 255 / 90%), transparent 32rem),
+    radial-gradient(circle at 88% 92%, rgb(208 220 202 / 48%), transparent 30rem),
+    #f3eee5;
+}
+
+main {
+  width: min(100% - 2rem, 64rem);
+  min-height: 100vh;
+  margin-inline: auto;
+  padding: clamp(3rem, 9vh, 7rem) 0 2.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: clamp(2.25rem, 6vw, 4.25rem);
+}
+
+.home-mark {
+  width: 4.25rem;
+  height: 4.25rem;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(62 81 60 / 10%);
+  border-radius: 1.35rem;
+  color: #f7faf5;
+  background: #486147;
+  box-shadow: 0 0.75rem 2rem rgb(52 68 51 / 18%);
+}
+
+.home-mark svg {
+  width: 2.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.4;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  color: #62705e;
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.6rem);
+  font-weight: 720;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.intro {
+  margin: 0.65rem 0 0;
+  color: #656159;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+.services {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.service-card {
+  min-height: 10.5rem;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.15rem;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgb(59 55 47 / 10%);
+  border-radius: 1.5rem;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 0.5rem 1.75rem rgb(74 67 56 / 8%);
+  backdrop-filter: blur(0.5rem);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.service-card:hover {
+  transform: translateY(-0.2rem);
+  border-color: rgb(59 55 47 / 18%);
+  box-shadow: 0 1rem 2.5rem rgb(74 67 56 / 13%);
+}
+
+.service-card:focus-visible {
+  outline: 0.2rem solid #2e613f;
+  outline-offset: 0.25rem;
+}
+
+.service-icon {
+  width: 3.6rem;
+  height: 3.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1.1rem;
+}
+
+.service-icon svg {
+  width: 2.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.jellyfin .service-icon {
+  color: #6f43be;
+  background: #eee7fa;
+}
+
+.jellyfin .service-icon path:first-child {
+  fill: rgb(111 67 190 / 12%);
+}
+
+.paperless .service-icon {
+  color: #3e6948;
+  background: #e4efe3;
+}
+
+.service-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.service-copy strong {
+  font-size: 1.18rem;
+  letter-spacing: -0.015em;
+}
+
+.service-copy span {
+  color: #6a665e;
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+
+.arrow {
+  width: 1.5rem;
+  fill: none;
+  stroke: #89847a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  transition: transform 160ms ease;
+}
+
+.service-card:hover .arrow {
+  transform: translateX(0.15rem);
+}
+
+footer {
+  margin-top: auto;
+  padding-top: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #706c63;
+  font-size: 0.84rem;
+}
+
+.status-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #54845d;
+  box-shadow: 0 0 0 0.2rem rgb(84 132 93 / 13%);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 43rem) {
+  main {
+    width: min(100% - 1.25rem, 34rem);
+    padding-top: 2.5rem;
+  }
+
+  .hero {
+    align-items: flex-start;
+  }
+
+  .home-mark {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1.1rem;
+  }
+
+  .home-mark svg {
+    width: 2rem;
+  }
+
+  .services {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card {
+    min-height: 8.5rem;
+    padding: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .arrow {
+    transition: none;
+  }
+}

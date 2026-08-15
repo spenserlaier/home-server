@@ -42,7 +42,8 @@ adlists, groups, or client rules are added later, either declare a reconciliatio
 mechanism or add a reviewed Teleporter export to the native backup producers
 before treating them as recovery-critical.
 
-The declared local records include all current `home.hyrax.fyi` services plus:
+The declared local records include the `home.hyrax.fyi` household portal, all
+current service names below it, and:
 
 ```text
 homeserver.home.arpa -> 192.168.4.22

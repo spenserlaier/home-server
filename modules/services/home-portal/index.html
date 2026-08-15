@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3eee5">
+    <meta name="description" content="Household services">
+    <title>Home</title>
+    <link rel="icon" href="/home.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <div class="home-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <path d="M9 22.5 24 10l15 12.5V39a2 2 0 0 1-2 2h-8V29H19v12h-8a2 2 0 0 1-2-2Z"/>
+            <path d="m5 24 19-16 19 16"/>
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">Household services</p>
+          <h1>Welcome home.</h1>
+          <p class="intro">Everything shared, in one place.</p>
+        </div>
+      </header>
+
+      <section class="services" aria-labelledby="services-heading">
+        <h2 id="services-heading" class="visually-hidden">Services</h2>
+
+        <a class="service-card jellyfin" href="https://jellyfin.home.hyrax.fyi">
+          <span class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <path d="M24 8 9 37h30L24 8Z"/>
+              <path d="m24 18-8 15h16l-8-15Z"/>
+            </svg>
+          </span>
+          <span class="service-copy">
+            <strong>Jellyfin</strong>
+            <span>Watch our movies and television</span>
+          </span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </a>
+
+        <a class="service-card paperless" href="https://paperless.home.hyrax.fyi">
+          <span class="service-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <path d="M14 6h14l8 8v28H14a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/>
+              <path d="M28 6v9h8M18 24h12M18 30h12M18 36h8"/>
+            </svg>
+          </span>
+          <span class="service-copy">
+            <strong>Household documents</strong>
+            <span>Find, organize, and add documents</span>
+          </span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </a>
+      </section>
+
+      <footer>
+        <span class="status-dot" aria-hidden="true"></span>
+        Available on the home network
+      </footer>
+    </main>
+  </body>
+</html>

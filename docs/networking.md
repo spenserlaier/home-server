@@ -1,8 +1,9 @@
 # Private networking and DNS
 
-Private services use names below `home.hyrax.fyi`. They are not published with
-public A or AAAA records and the router must not forward ports 80 or 443 from
-the internet. Caddy is the only HTTP entry point for application services.
+The household portal uses `home.hyrax.fyi`, and private services use names
+below it. They are not published with public A or AAAA records and the router
+must not forward ports 80 or 443 from the internet. Caddy is the only HTTP
+entry point for the portal and application services.
 
 The target resolution path is:
 
@@ -18,7 +19,7 @@ pointed at the new resolver, add individual records to the existing router DNS
 if it supports them. Otherwise, add a temporary hosts-file entry on the client:
 
 ```text
-192.168.4.22 caddy.home.hyrax.fyi jellyfin.home.hyrax.fyi paperless.home.hyrax.fyi invoices.home.hyrax.fyi ntfy.home.hyrax.fyi pihole.home.hyrax.fyi
+192.168.4.22 home.hyrax.fyi caddy.home.hyrax.fyi jellyfin.home.hyrax.fyi paperless.home.hyrax.fyi invoices.home.hyrax.fyi ntfy.home.hyrax.fyi pihole.home.hyrax.fyi
 ```
 
 Do not publish the LAN address through Porkbun. Public DNS is used only for
@@ -42,6 +43,19 @@ curl --fail https://caddy.home.hyrax.fyi/healthz
 
 The response must be `ok`. Other paths are aborted rather than serving a
 default site. Requests over HTTP redirect to HTTPS.
+
+## Household portal
+
+The static household portal is available at:
+
+```text
+https://home.hyrax.fyi
+```
+
+It links only to household-facing services. It contains no application
+credentials, administrative links, live service data, or third-party assets.
+Its availability message describes network scope and is not a live health
+indicator; operational monitoring remains responsible for failure detection.
 
 ## Porkbun DNS-01 credentials
 
