@@ -12,11 +12,13 @@ NetBird client  -> Pi-hole -> homeserver LAN address through NetBird routing
 public resolver -> no private address
 ```
 
-Until Pi-hole is migrated, add individual records to the existing router DNS
+Pi-hole now declares these private records on the homeserver. Follow the staged
+migration and rollback procedure in [pihole.md](./pihole.md). Until a client is
+pointed at the new resolver, add individual records to the existing router DNS
 if it supports them. Otherwise, add a temporary hosts-file entry on the client:
 
 ```text
-HOMESERVER_LAN_ADDRESS caddy.home.hyrax.fyi jellyfin.home.hyrax.fyi paperless.home.hyrax.fyi invoices.home.hyrax.fyi ntfy.home.hyrax.fyi
+192.168.4.22 caddy.home.hyrax.fyi jellyfin.home.hyrax.fyi paperless.home.hyrax.fyi invoices.home.hyrax.fyi ntfy.home.hyrax.fyi pihole.home.hyrax.fyi
 ```
 
 Do not publish the LAN address through Porkbun. Public DNS is used only for

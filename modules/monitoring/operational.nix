@@ -171,6 +171,8 @@ let
     "ntfy-bootstrap"
     "ntfy-sh"
     "paperless-exporter"
+    "pihole-dns-check"
+    "podman-pihole"
   ];
 in
 {

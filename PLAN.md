@@ -883,6 +883,10 @@ the services being monitored.
 
 ## Phase 8 — Pi-hole migration
 
+Status: the resolver, private records, dashboard route, SOPS-managed credential,
+and direct DNS health check are declared. Direct validation, one-client testing,
+and the final router DHCP DNS change remain staged acceptance steps.
+
 Implement:
 
 * Pi-hole
@@ -1073,6 +1077,6 @@ follow-up work without blocking completion.
 
 # 19. Immediate Next Step
 
-Complete the pre-Phase 8 operational safety slice, then begin the staged Pi-hole
-migration. Start with backup/service failure notifications, disk-space alerts,
-and SMART monitoring; keep the implementation small and directly actionable.
+Deploy and directly validate Pi-hole, then move one test client to it. Keep the
+existing Raspberry Pi resolver available until the new path has passed the
+staged LAN-wide migration described in `docs/pihole.md`.

@@ -17,6 +17,7 @@
     ../../modules/services/jellyfin.nix
     ../../modules/services/paperless.nix
     ../../modules/services/paperless-scanner.nix
+    ../../modules/services/pihole.nix
   ]
   # Generate this file on the physical machine before its first install. A
   # conditional import keeps remote evaluation possible until then.
@@ -28,6 +29,11 @@
     enable = true;
     baseDomain = "home.hyrax.fyi";
     enableDnsChallenge = true;
+  };
+
+  homelab.pihole = {
+    enable = true;
+    lanAddress = "192.168.4.22";
   };
 
   homelab.backup = {

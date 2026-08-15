@@ -23,6 +23,8 @@ Encrypted off-host backup initialization, verification, and restore operations
 are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
 Local failure, backup-freshness, capacity, and SMART monitoring are documented
 in [docs/operational-monitoring.md](./docs/operational-monitoring.md).
+Pi-hole deployment, staged client migration, and rollback are documented in
+[docs/pihole.md](./docs/pihole.md).
 
 ## Current scope
 
@@ -42,14 +44,16 @@ migration (Phase 7):
 - InvoiceShelf 2.4.2 and MariaDB 10.11.14 pinned by immutable OCI digests
 - durable local alerts with LAN-only ntfy push delivery and hosted
   Healthchecks.io dead-man monitoring
+- a declarative Pi-hole resolver ready for staged test-client migration
 
 InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent
 off-host backup, isolated Kopia restoration, and recovered-artifact validation.
 The narrow Invoice Ninja migration is reconciled, representative PDFs and totals
 have been validated, and a fresh post-migration backup has succeeded.
 InvoiceShelf is in live use while Invoice Ninja remains available as a fallback.
-The next milestone is a small operational-safety pass followed by staged Pi-hole
-migration. Remote access and secondary services remain intentionally deferred.
+The operational safety slice is live, and Pi-hole is entering staged
+test-client migration. Remote access and secondary services remain intentionally
+deferred.
 
 ## Development checks
 
