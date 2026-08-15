@@ -32,6 +32,12 @@ container manages ownership of its own data directory. The module also creates
 `storage/app/templates/pdf`, which InvoiceShelf requires while caching views
 but its container entrypoint does not create on a fresh bind mount.
 
+The upstream entrypoint initializes `storage/framework`, `storage/logs`, and
+`bootstrap/cache` as `0755`, while the setup wizard requires `0775`. A
+declarative `ExecStartPost` corrects all three after every container start;
+`bootstrap/cache` lives in the disposable container layer, so a one-time host
+permission change would not be sufficient.
+
 ## Secrets
 
 Add the following values to `secrets/homeserver.yaml` using the workflow in

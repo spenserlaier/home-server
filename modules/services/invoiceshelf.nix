@@ -18,6 +18,26 @@ let
   appImage = "docker.io/invoiceshelf/invoiceshelf:2.4.2@sha256:cc6e097fcf4d5e5d0480b68aba7fac4bb86c2e46d80c0c5c17e697aee6356cd8";
   databaseImage = "docker.io/library/mariadb:10.11.14@sha256:3a7d3cbc8b6fddf66433d80dc124c1e4e75a73ebab9c6e137529cc270bdadfc0";
 
+  fixApplicationModes = pkgs.writeShellScript "fix-invoiceshelf-application-modes" ''
+    set -o errexit -o nounset -o pipefail
+
+    for _ in $(${pkgs.coreutils}/bin/seq 1 30); do
+      if ${pkgs.podman}/bin/podman exec ${appContainer} test \
+        -d /var/www/html/storage/framework \
+        -a -d /var/www/html/storage/logs \
+        -a -d /var/www/html/bootstrap/cache; then
+        exec ${pkgs.podman}/bin/podman exec ${appContainer} chmod 0775 \
+          /var/www/html/storage/framework \
+          /var/www/html/storage/logs \
+          /var/www/html/bootstrap/cache
+      fi
+      ${pkgs.coreutils}/bin/sleep 1
+    done
+
+    echo "InvoiceShelf did not initialize its writable directories within 30 seconds" >&2
+    exit 1
+  '';
+
   validateBackup = pkgs.writeShellApplication {
     name = "validate-service-invoiceshelf-backup";
     runtimeInputs = with pkgs; [
@@ -250,7 +270,9 @@ in
         mode = "0400";
         content = ''
           MARIADB_PASSWORD=${lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_password"}
-          MARIADB_ROOT_PASSWORD=${lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_root_password"}
+          MARIADB_ROOT_PASSWORD=${
+            lib.escapeShellArg config.sops.placeholder."invoiceshelf/database_root_password"
+          }
         '';
       };
     };
@@ -297,7 +319,10 @@ in
       "podman-${appContainer}" = {
         requires = [ "invoiceshelf-network.service" ];
         after = [ "invoiceshelf-network.service" ];
-        serviceConfig.Restart = lib.mkForce "on-failure";
+        serviceConfig = {
+          Restart = lib.mkForce "on-failure";
+          ExecStartPost = fixApplicationModes;
+        };
       };
 
       invoiceshelf-backup = {
