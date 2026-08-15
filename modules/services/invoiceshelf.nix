@@ -70,7 +70,7 @@ let
 
       gzip --test "$export_dir/database.sql.gz"
       gzip --decompress --stdout "$export_dir/database.sql.gz" \
-        | grep --fixed-strings --max-count=1 'MariaDB dump' >/dev/null
+        | grep --fixed-strings 'MariaDB dump' >/dev/null
 
       archive_listing="$(mktemp)"
       trap 'rm -f "$archive_listing"' EXIT
