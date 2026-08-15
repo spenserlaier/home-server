@@ -24,8 +24,8 @@ are documented in [docs/backup-and-restore.md](./docs/backup-and-restore.md).
 
 ## Current scope
 
-This repository implements the platform through the empty InvoiceShelf
-deployment configuration (Phase 6; deployment validation remains):
+This repository implements and validates the platform through the empty
+InvoiceShelf deployment (Phase 6):
 
 - NixOS 26.05 on `x86_64-linux`
 - UEFI/systemd-boot
@@ -39,10 +39,13 @@ deployment configuration (Phase 6; deployment validation remains):
 - encrypted, immutable off-host Kopia generations in Backblaze B2
 - InvoiceShelf 2.4.2 and MariaDB 10.11.14 pinned by immutable OCI digests
 
-The next acceptance milestone is deploying and validating InvoiceShelf with
-empty test data. Migration of the existing Invoice Ninja records remains a
-separate later step. Pi-hole, operational hardening, remote access, and
-secondary services are also intentionally deferred.
+InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent
+off-host backup, isolated Kopia restoration, and recovered-artifact validation.
+The narrow Invoice Ninja migration is imported and its customer, invoice, line
+item, payment, and status counts reconcile. A post-migration PDF spot check and
+fresh backup remain before retiring the old instance. Pi-hole, operational
+hardening, remote access, and secondary services are also intentionally
+deferred.
 
 ## Development checks
 

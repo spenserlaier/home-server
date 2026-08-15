@@ -7,3 +7,10 @@
 /secrets/README.local
 /.env
 /.env.*
+
+# Private inputs and outputs from the one-time invoice migration.
+/migration-private/
+/invoiceninja*.sql
+/invoiceshelf-import*.sql
+
+*.pyc

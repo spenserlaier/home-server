@@ -25,7 +25,7 @@ The implementation should favor understandable, boring infrastructure over unnec
 
 ## Current implementation status
 
-Phases 0–5 are operational. The host, persistent-state conventions, SOPS
+Phases 0–6 are operational. The host, persistent-state conventions, SOPS
 secrets, private Caddy endpoints, Jellyfin, Paperless, direct Brother scanner
 ingestion, native service exports, and encrypted off-host Kopia generations
 have all been deployed and exercised.
@@ -39,9 +39,12 @@ Paperless-document restore, duplex and blank-page scanner profiles, and broader
 reboot/recovery drills. These tests should be combined where practical and do
 not block the next development phase.
 
-The immediate development target is Phase 6: deploy and validate the declared
-InvoiceShelf service with empty test data. Migration from Invoice Ninja remains
-Phase 7.
+InvoiceShelf 2.4.2 and MariaDB 10.11.14 are deployed by immutable OCI digest.
+Empty-instance customer, invoice, PDF, persistence, validated backup, coherent
+Kopia upload, and isolated artifact-restore tests have succeeded. Phase 7's
+narrow Invoice Ninja record import is complete and its aggregate records and
+statuses reconcile. A migrated PDF spot check and fresh post-migration backup
+remain before the source instance is retired.
 
 ---
 
@@ -787,6 +790,9 @@ Success criteria:
 ---
 
 ## Phase 7 — Invoice Ninja to InvoiceShelf migration
+
+Status: imported and reconciled on August 14, 2026. Final PDF and
+post-migration backup checks remain before retiring the source instance.
 
 Implement:
 

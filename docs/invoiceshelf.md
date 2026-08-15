@@ -102,6 +102,12 @@ has been configured and tested.
 
 ## Empty-deployment acceptance
 
+Completed on August 14, 2026. A disposable customer and invoice were created,
+PDF generation and persistence were verified, all coherent Kopia producers
+succeeded, and the resulting InvoiceShelf artifact was restored beneath
+`/srv/restore-tests` and validated. Its recovered metadata was byte-identical
+to the live staging artifact.
+
 Before writing migration tooling, verify:
 
 1. Login and company branding work.
@@ -139,15 +145,23 @@ sudo validate-service-invoiceshelf-backup \
 so an invalid InvoiceShelf artifact prevents the coherent off-host generation
 from succeeding.
 
-## Migration boundary
+## Invoice Ninja migration
 
-The existing Invoice Ninja 5.11.43 instance remains authoritative until a
-separate migration has been validated. Its source database is MariaDB 10.11.14
-(`utf8mb4_unicode_ci`, 74 InnoDB tables) with approximately 5.8 MiB of data and
-approximately 3.7 MiB under `public/storage`.
+The narrow migration completed on August 14, 2026 using
+`scripts/invoiceninja-to-invoiceshelf.py`. The converter reads the source
+MariaDB dump and writes a private transactional SQL file outside the repository;
+customer and invoice data must never be committed. It transforms records rather
+than restoring the Invoice Ninja database or reusing Invoice Ninja's Laravel
+key. Run the generated import only against a clean, empty InvoiceShelf database.
+The SQL is not idempotent and must never be rerun against an imported instance.
+The converter refuses to overwrite an existing output file; remove a prior
+output deliberately before generating a replacement.
 
-Migration will transform customers, invoices, line items, payments, statuses,
-and any required documents into InvoiceShelf records. It will not restore the
-Invoice Ninja database into InvoiceShelf or reuse Invoice Ninja's Laravel key.
-Keep the source instance intact until record counts, invoice totals, PDFs, and
-payment statuses agree.
+The imported customer, invoices, line items, payments, totals, and statuses were
+reconciled with the source. Deleted source records were deliberately omitted.
+No source document bundle was required because the migration goal is historical
+record tracking; InvoiceShelf regenerates PDFs from the imported records.
+
+Keep the Invoice Ninja 5.11.43 instance intact until representative migrated
+invoice totals and PDFs have been checked and a fresh post-migration backup has
+succeeded.
