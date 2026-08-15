@@ -16,7 +16,7 @@ Until Pi-hole is migrated, add individual records to the existing router DNS
 if it supports them. Otherwise, add a temporary hosts-file entry on the client:
 
 ```text
-HOMESERVER_LAN_ADDRESS caddy.home.hyrax.fyi jellyfin.home.hyrax.fyi paperless.home.hyrax.fyi invoices.home.hyrax.fyi
+HOMESERVER_LAN_ADDRESS caddy.home.hyrax.fyi jellyfin.home.hyrax.fyi paperless.home.hyrax.fyi invoices.home.hyrax.fyi ntfy.home.hyrax.fyi
 ```
 
 Do not publish the LAN address through Porkbun. Public DNS is used only for

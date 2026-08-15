@@ -217,10 +217,8 @@ Requirements:
 * Stable DNS names
 * Central reverse proxy
 * Avoid hardcoding LAN addresses into application state
-* NetBird is currently the leading candidate, but this is not yet a final
-  architectural decision
-* Tailscale remains an alternative
-* Headscale may be evaluated if self-hosted Tailscale coordination is desirable
+* NetBird is the selected private-overlay path
+* Revisit alternatives only if deployment testing exposes a concrete blocker
 
 ---
 
@@ -863,6 +861,12 @@ Keep existing instance intact until validation is complete.
 
 ## Pre-Phase 8 — Operational safety slice
 
+Status: local alert persistence, service failure hooks, disk-space checks, SMART
+monitoring, backup freshness, authenticated LAN-only ntfy delivery, and hosted
+Healthchecks.io reconciliation are declared. Deployment acceptance requires the
+Healthchecks project API key, verified email integration, Android subscription,
+and live end-to-end tests.
+
 Complete a deliberately small hardening pass before migrating LAN DNS:
 
 * Backup and service-timer failure notifications
@@ -933,12 +937,9 @@ Avoid adding monitoring infrastructure substantially more complex than the serve
 
 Optional later work:
 
-* Evaluate NetBird first; it is currently the preferred candidate
-* Retain Tailscale as an alternative
+* Deploy and validate NetBird
 * Private service access
 * DNS integration
-* Evaluate Headscale only if the Tailscale ecosystem is selected and
-  self-hosted coordination is desirable
 
 Remote access must not require public exposure of application services.
 

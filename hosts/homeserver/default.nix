@@ -10,6 +10,7 @@
     ../../modules/base/users.nix
     ../../modules/backup/jellyfin-native.nix
     ../../modules/backup/kopia.nix
+    ../../modules/monitoring/notifications.nix
     ../../modules/monitoring/operational.nix
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/invoiceshelf.nix

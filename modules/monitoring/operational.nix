@@ -1,9 +1,11 @@
 {
+  config,
   lib,
   pkgs,
   ...
 }:
 let
+  cfg = config.homelab.monitoring;
   alertStateDir = "/var/lib/homelab-alerts";
   monitoringStateDir = "/var/lib/homelab-monitoring";
   backupSuccessMarker = "${monitoringStateDir}/kopia-backup-success";
@@ -40,6 +42,12 @@ let
       systemd-cat --identifier=homelab-alert --priority=err \
         printf '%s: %s\n' "$key" "$message"
       printf 'HOME SERVER ALERT: %s: %s\n' "$key" "$message" | wall --nobanner || true
+      ${lib.optionalString (cfg.alertDeliveryCommand != null) ''
+        if ! ${cfg.alertDeliveryCommand} "$key" "$message"; then
+          systemd-cat --identifier=homelab-alert --priority=warning \
+            printf 'External delivery failed for alert %s\n' "$key"
+        fi
+      ''}
     '';
   };
 
@@ -154,14 +162,28 @@ let
   };
 
   monitoredUnits = [
+    "healthchecks-heartbeat"
+    "healthchecks-reconcile"
     "invoiceshelf-backup"
     "jellyfin-backup"
     "kopia-backup"
     "kopia-verify"
+    "ntfy-bootstrap"
+    "ntfy-sh"
     "paperless-exporter"
   ];
 in
 {
+  options.homelab.monitoring.alertDeliveryCommand = lib.mkOption {
+    type = lib.types.nullOr lib.types.str;
+    default = null;
+    description = ''
+      Optional executable called with an alert key and message after the alert
+      has been recorded locally. Delivery failure never suppresses the durable
+      local alert.
+    '';
+  };
+
   config = lib.mkMerge [
     {
       systemd.tmpfiles.rules = [
@@ -186,6 +208,16 @@ in
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${lib.getExe unitFailure} %I";
+          };
+        };
+
+        homelab-alert-test = {
+          description = "Create a test home-server alert";
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = ''
+              ${lib.getExe recordAlert} delivery-test "Test alert from homeserver"
+            '';
           };
         };
 

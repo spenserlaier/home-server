@@ -106,6 +106,11 @@ invoiceshelf:
   app_key: replace-me
   database_password: replace-me
   database_root_password: replace-me
+ntfy:
+  publisher_password: generated-random-password
+  subscriber_password: generated-random-password
+healthchecks:
+  api_key: project-scoped-read-write-api-key
 ```
 
 On save, SOPS writes only encrypted values plus recipient metadata. Before

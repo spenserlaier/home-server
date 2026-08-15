@@ -40,6 +40,8 @@ migration (Phase 7):
 - Paperless-ngx with PostgreSQL, native exports, and direct scanner ingestion
 - encrypted, immutable off-host Kopia generations in Backblaze B2
 - InvoiceShelf 2.4.2 and MariaDB 10.11.14 pinned by immutable OCI digests
+- durable local alerts with LAN-only ntfy push delivery and hosted
+  Healthchecks.io dead-man monitoring
 
 InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent
 off-host backup, isolated Kopia restoration, and recovered-artifact validation.
