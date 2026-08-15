@@ -26,22 +26,26 @@ let
       gnugrep
     ];
     text = ''
-      local_answer="$(dig +short +time=3 +tries=1 \
-        @${lib.escapeShellArg cfg.lanAddress} ${lib.escapeShellArg hostName} A)"
-      grep --fixed-strings --line-regexp ${lib.escapeShellArg cfg.lanAddress} \
-        <<<"$local_answer" >/dev/null || {
-        echo "Pi-hole returned an unexpected address for ${hostName}" >&2
-        exit 1
-      }
+      local_answer=""
+      external_answer=""
+      for _ in $(seq 1 30); do
+        if local_answer="$(dig +short +time=1 +tries=1 \
+          @${lib.escapeShellArg cfg.lanAddress} ${lib.escapeShellArg hostName} A 2>/dev/null)" \
+          && grep --fixed-strings --line-regexp ${lib.escapeShellArg cfg.lanAddress} \
+            <<<"$local_answer" >/dev/null \
+          && external_answer="$(dig +short +time=1 +tries=1 \
+            @${lib.escapeShellArg cfg.lanAddress} example.com A 2>/dev/null)" \
+          && [[ -n "$external_answer" ]]; then
+          echo "Pi-hole resolved local and external test names"
+          exit 0
+        fi
+        sleep 2
+      done
 
-      external_answer="$(dig +short +time=3 +tries=1 \
-        @${lib.escapeShellArg cfg.lanAddress} example.com A)"
-      [[ -n "$external_answer" ]] || {
-        echo "Pi-hole did not resolve an external test name" >&2
-        exit 1
-      }
-
-      echo "Pi-hole resolved local and external test names"
+      echo "Pi-hole DNS did not become healthy within 60 seconds" >&2
+      echo "Expected ${hostName} to resolve to ${cfg.lanAddress}; received: ''${local_answer:-no answer}" >&2
+      [[ -n "$external_answer" ]] || echo "The external test name did not resolve" >&2
+      exit 1
     '';
   };
 in
