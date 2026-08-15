@@ -228,7 +228,7 @@ in
             Type = "oneshot";
             ExecStart = lib.getExe checkDiskSpace;
             ExecStartPost = [
-              "${lib.getExe clearAlert} unit-homelab-disk-space-check.service"
+              "+${lib.getExe clearAlert} unit-homelab-disk-space-check.service"
             ];
           };
         };
@@ -240,7 +240,7 @@ in
             Type = "oneshot";
             ExecStart = lib.getExe checkBackupFreshness;
             ExecStartPost = [
-              "${lib.getExe clearAlert} unit-homelab-backup-freshness-check.service"
+              "+${lib.getExe clearAlert} unit-homelab-backup-freshness-check.service"
             ];
           };
         };
@@ -277,7 +277,7 @@ in
       systemd.services = lib.genAttrs monitoredUnits (name: {
         unitConfig.OnFailure = [ "homelab-unit-failure@%n.service" ];
         serviceConfig.ExecStartPost = [
-          "${lib.getExe clearAlert} unit-${name}.service"
+          "+${lib.getExe clearAlert} unit-${name}.service"
         ]
         ++ lib.optional (name == "kopia-backup") (lib.getExe recordBackupSuccess);
       });

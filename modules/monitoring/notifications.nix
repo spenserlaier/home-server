@@ -280,7 +280,6 @@ in
         User = config.services.ntfy-sh.user;
         Group = config.services.ntfy-sh.group;
         UMask = "0077";
-        StateDirectory = "ntfy-sh";
         LoadCredential = [
           "publisher-password:${config.sops.secrets."ntfy/publisher_password".path}"
           "subscriber-password:${config.sops.secrets."ntfy/subscriber_password".path}"
