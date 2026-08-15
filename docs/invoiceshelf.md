@@ -26,7 +26,9 @@ still prerelease and is not a deployment target.
 These bind mounts are the only application state retained across container
 recreation. Container layers are disposable. Do not copy source code, caches,
 or generated frontend bundles from the old Invoice Ninja installation into
-these paths.
+these paths. The application image runs as numeric uid/gid 82, so the module
+declaratively assigns both `storage` and `modules` to `82:82`; the database
+container manages ownership of its own data directory.
 
 ## Secrets
 

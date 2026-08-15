@@ -256,8 +256,10 @@ in
   systemd = {
     tmpfiles.rules = [
       "d ${serviceRoot} 0750 root root - -"
-      "d ${storageDir} 0750 root root - -"
-      "d ${modulesDir} 0750 root root - -"
+      # The upstream image runs as www-data with uid/gid 82 and refuses
+      # writable bind mounts owned by another identity.
+      "d ${storageDir} 0750 82 82 - -"
+      "d ${modulesDir} 0750 82 82 - -"
       "d ${databaseDir} 0700 root root - -"
       "d ${exportDir} 0700 root root - -"
     ];
