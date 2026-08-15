@@ -13,6 +13,7 @@
     ../../modules/monitoring/notifications.nix
     ../../modules/monitoring/operational.nix
     ../../modules/networking/reverse-proxy.nix
+    ../../modules/services/audiobookshelf.nix
     ../../modules/services/invoiceshelf.nix
     ../../modules/services/home-portal.nix
     ../../modules/services/jellyfin.nix
@@ -53,6 +54,7 @@
       endpoint = "s3.us-east-005.backblazeb2.com";
       region = "us-east-005";
       prepareUnits = [
+        "audiobookshelf-backup.service"
         "jellyfin-backup.service"
         "paperless-exporter.service"
         "invoiceshelf-backup.service"

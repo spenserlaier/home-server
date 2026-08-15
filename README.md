@@ -13,6 +13,8 @@ Private DNS, Caddy bootstrap, and Porkbun DNS-01 setup are documented in
 [docs/networking.md](./docs/networking.md).
 Jellyfin deployment, state, media, and verification are documented in
 [docs/jellyfin.md](./docs/jellyfin.md).
+Audiobookshelf deployment, library layout, backup, and verification are
+documented in [docs/audiobookshelf.md](./docs/audiobookshelf.md).
 Paperless deployment, persistence, exports, and initial verification are
 documented in [docs/paperless.md](./docs/paperless.md).
 Brother scanner SFTP ingestion and verification are documented in
@@ -42,6 +44,7 @@ migration (Phase 7):
 - SOPS-managed runtime secrets
 - private HTTPS through Caddy and Porkbun DNS-01
 - Jellyfin with hardware transcoding and native backup artifacts
+- Audiobookshelf with a separately managed, read-only audiobook library
 - Paperless-ngx with PostgreSQL, native exports, and direct scanner ingestion
 - encrypted, immutable off-host Kopia generations in Backblaze B2
 - InvoiceShelf 2.4.2 and MariaDB 10.11.14 pinned by immutable OCI digests
