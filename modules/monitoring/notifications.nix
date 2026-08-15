@@ -279,7 +279,9 @@ in
         Type = "oneshot";
         User = config.services.ntfy-sh.user;
         Group = config.services.ntfy-sh.group;
+        DynamicUser = true;
         UMask = "0077";
+        StateDirectory = "ntfy-sh";
         LoadCredential = [
           "publisher-password:${config.sops.secrets."ntfy/publisher_password".path}"
           "subscriber-password:${config.sops.secrets."ntfy/subscriber_password".path}"
