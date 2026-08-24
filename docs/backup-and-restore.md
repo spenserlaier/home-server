@@ -48,16 +48,18 @@ Then create and validate the first generation:
 ```console
 sudo systemctl start kopia-backup.service
 sudo systemctl status \
-  jellyfin-backup.service paperless-exporter.service kopia-backup.service
+  audiobookshelf-backup.service homebox-backup.service \
+  jellyfin-backup.service paperless-exporter.service \
+  invoiceshelf-backup.service kopia-backup.service
 sudo journalctl --unit kopia-backup.service --since today
 systemctl list-timers kopia-backup.timer kopia-verify.timer
 ```
 
-`kopia-backup.service` first requires `jellyfin-backup.service`,
-`paperless-exporter.service`, and `invoiceshelf-backup.service`. A failure in
-any artifact producer therefore prevents an off-host generation from being
-reported as successful. The standalone producer timers are disabled so Kopia
-controls the coherent generation boundary.
+`kopia-backup.service` first requires the Audiobookshelf, Homebox, Jellyfin,
+Paperless, and InvoiceShelf artifact producers. A failure in any producer
+therefore prevents an off-host generation from being reported as successful.
+The standalone producer timers are disabled so Kopia controls the coherent
+generation boundary.
 
 ## Verification
 

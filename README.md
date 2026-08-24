@@ -15,6 +15,8 @@ Jellyfin deployment, state, media, and verification are documented in
 [docs/jellyfin.md](./docs/jellyfin.md).
 Audiobookshelf deployment, library layout, backup, and verification are
 documented in [docs/audiobookshelf.md](./docs/audiobookshelf.md).
+Homebox deployment, owner bootstrap, backup, and verification are documented in
+[docs/homebox.md](./docs/homebox.md).
 Paperless deployment, persistence, exports, and initial verification are
 documented in [docs/paperless.md](./docs/paperless.md).
 Brother scanner SFTP ingestion and verification are documented in
@@ -45,6 +47,7 @@ migration (Phase 7):
 - private HTTPS through Caddy and Porkbun DNS-01
 - Jellyfin with hardware transcoding and native backup artifacts
 - Audiobookshelf with a separately managed, read-only audiobook library
+- Homebox household inventory with closed registration and coherent backups
 - Paperless-ngx with PostgreSQL, native exports, and direct scanner ingestion
 - encrypted, immutable off-host Kopia generations in Backblaze B2
 - InvoiceShelf 2.4.2 and MariaDB 10.11.14 pinned by immutable OCI digests

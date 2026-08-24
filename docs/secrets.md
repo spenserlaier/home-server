@@ -104,6 +104,8 @@ paperless:
   secret_key: replace-me
 audiobookshelf:
   admin_password: generated-random-password
+homebox:
+  admin_password: generated-random-password
 invoiceshelf:
   app_key: replace-me
   database_password: replace-me
