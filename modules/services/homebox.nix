@@ -210,6 +210,10 @@ in
         after = [ "homebox-initialize.service" ];
         requires = [ "homebox-initialize.service" ];
         unitConfig.RequiresMountsFor = [ stateRoot ];
+        preStart = lib.mkForce ''
+          ${pkgs.coreutils}/bin/rm -rf ${stateRoot}/tmp
+          ${pkgs.coreutils}/bin/mkdir -p ${stateRoot}/tmp
+        '';
         serviceConfig = {
           StateDirectory = lib.mkForce [ ];
           ReadWritePaths = [ stateRoot ];
