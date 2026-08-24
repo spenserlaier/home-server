@@ -167,7 +167,7 @@ in
         group = "audiobookshelf";
       };
       ${mediaRoot}.d = {
-        mode = "2750";
+        mode = "2770";
         user = "root";
         group = "media";
       };

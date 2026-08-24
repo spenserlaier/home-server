@@ -28,10 +28,13 @@ Audiobook source files are kept separately at:
 /srv/media/audiobooks
 ```
 
-The directory is `root:media`. Audiobookshelf and the administrator can read
-and traverse it, but Audiobookshelf cannot modify source files. This means its
-upload, metadata-embedding, and media-conversion features cannot write to the
-library; add and organize books through an administrative shell instead.
+The directory is `root:media` with mode `2770`. Its setgid bit makes files and
+directories copied by `spenser-admin` inherit the `media` group, allowing
+direct `scp` or `rsync` transfers into the library. Audiobookshelf can read the
+source files, but the service's `ReadOnlyPaths` sandbox prevents it from
+modifying them. Its upload, metadata-embedding, and media-conversion features
+therefore remain unavailable; add and organize books through an administrative
+shell instead.
 
 Use one directory per book. A useful starting layout is
 `Author/Series/Book` or `Author/Book`.
