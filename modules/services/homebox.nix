@@ -230,6 +230,7 @@ in
         };
         serviceConfig = {
           Type = "oneshot";
+          RemainAfterExit = true;
           User = "homebox";
           Group = "homebox";
           ExecStart = lib.getExe initializeHomebox;
