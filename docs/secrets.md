@@ -102,6 +102,8 @@ kopia:
   b2_application_key: replace-me
 paperless:
   secret_key: replace-me
+audiobookshelf:
+  admin_password: generated-random-password
 invoiceshelf:
   app_key: replace-me
   database_password: replace-me

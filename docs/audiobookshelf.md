@@ -38,16 +38,38 @@ Use one directory per book. A useful starting layout is
 
 ## First deployment
 
-After rebuilding, verify the service and proxy:
+Before rebuilding, add a distinct generated password to the encrypted secrets
+file:
+
+```yaml
+audiobookshelf:
+  admin_password: replace-with-a-generated-password
+```
+
+On first start, `audiobookshelf-initialize.service` waits for the loopback
+listener and creates the root account named `admin`. Caddy waits for this unit,
+so the uninitialized setup endpoint is not exposed through the household
+hostname. Later starts detect the initialized database and leave the account
+unchanged; changing the SOPS value does not rotate an existing password.
+
+After rebuilding, verify the bootstrap, service, and proxy:
 
 ```console
-sudo systemctl status audiobookshelf caddy
+sudo systemctl status audiobookshelf-initialize audiobookshelf caddy
+sudo journalctl --unit audiobookshelf-initialize --since today
 curl --fail --head https://audiobookshelf.home.hyrax.fyi
 ```
 
-Open `https://audiobookshelf.home.hyrax.fyi`, create the initial root account,
-and add an audiobook library rooted at `/srv/media/audiobooks`. Audiobookshelf
-has no default administrator credentials.
+Open `https://audiobookshelf.home.hyrax.fyi`, sign in as `admin` with the SOPS
+password, and add an audiobook library rooted at `/srv/media/audiobooks`. The
+generated password can be retrieved on an authorized administrative machine:
+
+```console
+sops decrypt --extract '["audiobookshelf"]["admin_password"]' secrets/homeserver.yaml
+```
+
+Avoid leaving the value in shell history, terminal scrollback, or a plaintext
+password file.
 
 Do not enable a separate HTTPS listener or expose port 8000. Caddy is the
 supported client entry point.
@@ -91,3 +113,5 @@ real state for a full recovery drill:
 
 Do not restore an archive over a running instance. Audiobookshelf's SQLite
 database must remain local to this machine rather than on a network filesystem.
+After restoring an initialized database, the bootstrap unit preserves the
+restored root credentials rather than applying the current SOPS value.
