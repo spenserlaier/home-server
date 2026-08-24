@@ -6,10 +6,16 @@ The household entry point is available only on the main home network:
 https://home.hyrax.fyi
 ```
 
-It intentionally exposes only Jellyfin and Paperless. Administrative services
-remain reachable by their direct private names but are not advertised in the
-portal. Application passwords must not be embedded in the portal or committed
-to this repository.
+The portal links to all household web applications: Jellyfin, Audiobookshelf,
+Paperless, Homebox, and InvoiceShelf. A visually separate **Administration**
+section links to Pi-hole and ntfy without presenting them as everyday household
+tools. Caddy's health endpoint is omitted because it is a diagnostic response,
+not an application interface. Application passwords are never embedded in the
+portal.
+
+The grouping is informational rather than an authorization boundary. Every
+application remains responsible for authentication and permissions, and all
+names remain reachable only through private DNS on the home network.
 
 Jellyfin and Paperless store users and permissions in their application
 databases. Those databases are backed up, but their user interfaces are not
@@ -95,13 +101,20 @@ adding remote access or public ingress.
 
 ## Network acceptance checks
 
-From a device on the main network, confirm the portal and both applications:
+From a device on the main network, confirm the portal and linked applications:
 
 ```console
 curl --fail https://home.hyrax.fyi
 curl --fail https://jellyfin.home.hyrax.fyi/health
+curl --fail --head https://audiobookshelf.home.hyrax.fyi
 curl --fail --head https://paperless.home.hyrax.fyi
+curl --fail https://homebox.home.hyrax.fyi/api/v1/status
+curl --fail --head https://invoices.home.hyrax.fyi
+curl --fail --head https://pihole.home.hyrax.fyi/admin/
 ```
+
+ntfy requires authentication and should reject an anonymous subscription; its
+authenticated acceptance procedure remains in `docs/operational-monitoring.md`.
 
 Eero Guest Wi-Fi is the visitor network and must remain distinct from the main
 network. From a laptop connected to Guest Wi-Fi, confirm both private DNS and

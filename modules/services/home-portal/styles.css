@@ -25,7 +25,7 @@ main {
   width: min(100% - 2rem, 64rem);
   min-height: 100vh;
   margin-inline: auto;
-  padding: clamp(3rem, 9vh, 7rem) 0 2.5rem;
+  padding: clamp(3rem, 7vh, 5.5rem) 0 2.5rem;
   display: flex;
   flex-direction: column;
 }
@@ -34,7 +34,7 @@ main {
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  margin-bottom: clamp(2.25rem, 6vw, 4.25rem);
+  margin-bottom: clamp(2.25rem, 5vw, 3.75rem);
 }
 
 .home-mark {
@@ -82,9 +82,44 @@ h1 {
   font-size: clamp(1rem, 2vw, 1.15rem);
 }
 
+.service-group + .service-group {
+  margin-top: 3.25rem;
+}
+
+.section-heading {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+}
+
+.section-heading > p {
+  max-width: 25rem;
+  margin: 0 0 0.1rem;
+  color: #777269;
+  font-size: 0.88rem;
+  text-align: right;
+}
+
+.section-kicker {
+  margin: 0 0 0.25rem;
+  color: #62705e;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
 .services {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.25rem;
 }
 
@@ -150,6 +185,70 @@ h1 {
   background: #e4efe3;
 }
 
+.audiobookshelf .service-icon {
+  color: #9a5b29;
+  background: #f6e8d8;
+}
+
+.homebox .service-icon {
+  color: #34717a;
+  background: #dff0f0;
+}
+
+.invoices .service-icon {
+  color: #9b7030;
+  background: #f5ecd8;
+}
+
+.administration {
+  padding: 1.5rem;
+  border: 1px solid rgb(67 72 77 / 12%);
+  border-radius: 1.5rem;
+  background: rgb(229 231 232 / 42%);
+}
+
+.administration .section-kicker {
+  color: #73777b;
+}
+
+.admin-services .service-card {
+  min-height: 8.25rem;
+  background: rgb(255 255 255 / 56%);
+  box-shadow: none;
+}
+
+.admin-services {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.service-copy strong {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.service-copy small {
+  padding: 0.2rem 0.45rem;
+  border: 1px solid rgb(77 81 84 / 14%);
+  border-radius: 999px;
+  color: #686c70;
+  background: rgb(255 255 255 / 60%);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pihole .service-icon {
+  color: #9b3a43;
+  background: #f4e2e3;
+}
+
+.ntfy .service-icon {
+  color: #5c6471;
+  background: #e5e8ec;
+}
+
 .service-copy {
   display: flex;
   flex-direction: column;
@@ -211,6 +310,12 @@ footer {
   border: 0;
 }
 
+@media (max-width: 55rem) {
+  .services {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 43rem) {
   main {
     width: min(100% - 1.25rem, 34rem);
@@ -233,6 +338,19 @@ footer {
 
   .services {
     grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    display: block;
+  }
+
+  .section-heading > p {
+    margin-top: 0.45rem;
+    text-align: left;
+  }
+
+  .administration {
+    padding: 1rem;
   }
 
   .service-card {
