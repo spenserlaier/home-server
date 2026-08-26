@@ -256,6 +256,52 @@ in
       avahi = {
         enable = true;
         openFirewall = false;
+        publish = {
+          enable = true;
+          addresses = true;
+        };
+        extraServiceFiles = {
+          paperless-save = ''
+            <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+            <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+            <service-group>
+              <name>Save to Paperless</name>
+              <service>
+                <type>_ipp._tcp</type>
+                <subtype>_print._sub._ipp._tcp</subtype>
+                <port>${toString cfg.savePort}</port>
+                <txt-record>rp=ipp/print</txt-record>
+                <txt-record>ty=Paperless PDF Archive</txt-record>
+                <txt-record>pdl=application/pdf</txt-record>
+                <txt-record>Color=T</txt-record>
+                <txt-record>Duplex=T</txt-record>
+                <txt-record>UUID=7c5cd48e-98be-4da2-95a7-a9c5f701215f</txt-record>
+                <txt-record>txtvers=1</txt-record>
+                <txt-record>qtotal=1</txt-record>
+              </service>
+            </service-group>
+          '';
+          paperless-print-save = ''
+            <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+            <!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+            <service-group>
+              <name>Print and Save to Paperless</name>
+              <service>
+                <type>_ipp._tcp</type>
+                <subtype>_print._sub._ipp._tcp</subtype>
+                <port>${toString cfg.printSavePort}</port>
+                <txt-record>rp=ipp/print</txt-record>
+                <txt-record>ty=Epson ET-4950 and Paperless Archive</txt-record>
+                <txt-record>pdl=application/pdf</txt-record>
+                <txt-record>Color=T</txt-record>
+                <txt-record>Duplex=T</txt-record>
+                <txt-record>UUID=c3ec9d81-2a53-413b-a6b7-553ffb62f0d6</txt-record>
+                <txt-record>txtvers=1</txt-record>
+                <txt-record>qtotal=1</txt-record>
+              </service>
+            </service-group>
+          '';
+        };
       };
     };
 
@@ -337,7 +383,7 @@ in
             User = serviceUser;
             Group = serviceUser;
             WorkingDirectory = root;
-            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -f application/pdf -F application/pdf -c ${lib.getExe saveCommand} -d ${saveSpool} -p ${toString cfg.savePort} -s 13,7 ${lib.escapeShellArg "Save to Paperless"}";
+            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -r off -f application/pdf -F application/pdf -c ${lib.getExe saveCommand} -d ${saveSpool} -p ${toString cfg.savePort} -s 13,7 ${lib.escapeShellArg "Save to Paperless"}";
             Restart = "on-failure";
             UMask = "0077";
             NoNewPrivileges = true;
@@ -360,7 +406,7 @@ in
             User = serviceUser;
             Group = serviceUser;
             WorkingDirectory = root;
-            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -f application/pdf -F application/pdf -c ${lib.getExe printSaveCommand} -d ${printSaveSpool} -p ${toString cfg.printSavePort} -s 13,7 ${lib.escapeShellArg "Print and Save to Paperless"}";
+            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -r off -f application/pdf -F application/pdf -c ${lib.getExe printSaveCommand} -d ${printSaveSpool} -p ${toString cfg.printSavePort} -s 13,7 ${lib.escapeShellArg "Print and Save to Paperless"}";
             Restart = "on-failure";
             UMask = "0077";
             NoNewPrivileges = true;

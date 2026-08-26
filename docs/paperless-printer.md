@@ -38,7 +38,8 @@ pages in the Paperless document.
 
 ## Network access
 
-The logical printers advertise themselves with DNS-SD/mDNS and listen on:
+Avahi advertises the logical printers with static DNS-SD/mDNS service records,
+while the IPP processes listen on:
 
 ```text
 ipp://homeserver.home.arpa:8631/ipp/print  Save to Paperless
@@ -48,6 +49,11 @@ ipp://homeserver.home.arpa:8632/ipp/print  Print and Save to Paperless
 TCP 8631 and 8632 and UDP 5353 are accepted only from the trusted
 `192.168.4.0/22` LAN. The queues do not require credentials, so membership of
 that LAN is the authorization boundary.
+
+The IPP processes have their built-in DNS-SD publisher disabled. CUPS 2.4.19's
+legacy Avahi integration can abort inside `avahi_entry_group_commit`; keeping
+advertisement in the system Avahi daemon avoids that failure and gives the
+service records a single owner.
 
 ## Deployment and acceptance
 
