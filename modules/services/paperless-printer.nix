@@ -337,7 +337,7 @@ in
             User = serviceUser;
             Group = serviceUser;
             WorkingDirectory = root;
-            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -f application/pdf -F application/pdf -c ${lib.getExe saveCommand} -d ${saveSpool} -n homeserver.home.arpa -p ${toString cfg.savePort} -s 13,7 ${lib.escapeShellArg "Save to Paperless"}";
+            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -f application/pdf -F application/pdf -c ${lib.getExe saveCommand} -d ${saveSpool} -p ${toString cfg.savePort} -s 13,7 ${lib.escapeShellArg "Save to Paperless"}";
             Restart = "on-failure";
             UMask = "0077";
             NoNewPrivileges = true;
@@ -360,7 +360,7 @@ in
             User = serviceUser;
             Group = serviceUser;
             WorkingDirectory = root;
-            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -f application/pdf -F application/pdf -c ${lib.getExe printSaveCommand} -d ${printSaveSpool} -n homeserver.home.arpa -p ${toString cfg.printSavePort} -s 13,7 ${lib.escapeShellArg "Print and Save to Paperless"}";
+            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -f application/pdf -F application/pdf -c ${lib.getExe printSaveCommand} -d ${printSaveSpool} -p ${toString cfg.printSavePort} -s 13,7 ${lib.escapeShellArg "Print and Save to Paperless"}";
             Restart = "on-failure";
             UMask = "0077";
             NoNewPrivileges = true;
