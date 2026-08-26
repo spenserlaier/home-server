@@ -167,6 +167,8 @@ let
       done
 
       # Completed payloads are transient; Paperless and CUPS own the durable results.
+      # $job expands in the nested Bash process.
+      # shellcheck disable=SC2016
       find ${lib.escapeShellArg jobsDir} -mindepth 1 -maxdepth 1 -type d -mtime +7 \
         -exec ${pkgs.bash}/bin/bash -c 'for job do
           [[ -e "$job/archive.done" && ! -e "$job/archive.pending" && ! -e "$job/archive.dispatching" ]] || continue
