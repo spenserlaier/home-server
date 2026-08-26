@@ -19,6 +19,7 @@
     ../../modules/services/home-portal.nix
     ../../modules/services/jellyfin.nix
     ../../modules/services/paperless.nix
+    ../../modules/services/paperless-printer.nix
     ../../modules/services/paperless-scanner.nix
     ../../modules/services/pihole.nix
   ]
@@ -41,6 +42,11 @@
   homelab.pihole = {
     enable = true;
     lanAddress = "192.168.4.22";
+  };
+
+  homelab.paperlessPrinter = {
+    enable = true;
+    printerAddress = "192.168.4.21";
   };
 
   homelab.backup = {

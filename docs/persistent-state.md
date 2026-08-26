@@ -29,6 +29,9 @@ Use these defaults unless a service has a documented reason to differ:
   making an application consumption directory world-writable. The Brother
   scanner is chrooted to `/srv/paperless-scanner/inbox`; a root-owned service
   atomically moves completed files into Paperless.
+- Logical printer jobs use `/srv/paperless-printer/jobs` as a private durable
+  outbox. These payloads are transient and excluded from Kopia because only the
+  application-consistent artifacts below `/srv/backups` are captured.
 - `/srv` itself: `0755 root:root`; service accounts cannot create arbitrary
   top-level directories.
 

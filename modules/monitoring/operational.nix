@@ -171,6 +171,10 @@ let
     "ntfy-bootstrap"
     "ntfy-sh"
     "paperless-exporter"
+    "paperless-printer-configure"
+    "paperless-printer-dispatch"
+    "paperless-print-save-printer"
+    "paperless-save-printer"
     "pihole-dns-check"
     "podman-pihole"
   ];
