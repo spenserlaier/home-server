@@ -83,17 +83,71 @@ let
     '';
   };
 
+  normalizeAndEnqueue =
+    mode:
+    pkgs.writeShellApplication {
+      name = "normalize-paperless-${mode}-print";
+      runtimeInputs = with pkgs; [
+        coreutils
+        cups
+        cups-filters
+      ];
+      text = ''
+        if [[ $# -ne 1 ]]; then
+          echo "ERROR: Usage: normalize-paperless-${mode}-print DOCUMENT" >&2
+          exit 1
+        fi
+
+        source="$1"
+        [[ -f "$source" && ! -L "$source" ]] || {
+          echo "ERROR: The submitted document is not a regular file" >&2
+          exit 1
+        }
+        source_size="$(stat --format=%s -- "$source")"
+        (( source_size > 0 && source_size <= ${toString cfg.maximumBytes} )) || {
+          echo "ERROR: The submitted document is empty or exceeds the configured size limit" >&2
+          exit 1
+        }
+
+        case "''${CONTENT_TYPE:-}" in
+          application/pdf)
+            exec ${lib.getExe enqueue} ${lib.escapeShellArg mode} "$source"
+            ;;
+          image/urf|image/jpeg)
+            normalized="$(mktemp --tmpdir=${lib.escapeShellArg root} .normalized-XXXXXXXX.pdf)"
+            trap 'rm -f -- "$normalized"' EXIT
+            export CUPS_DATADIR=/var/lib/cups/path/share/cups
+            export CUPS_SERVERBIN=/var/lib/cups/path/lib/cups
+            cupsfilter \
+              -i "$CONTENT_TYPE" \
+              -m application/pdf \
+              "$source" >"$normalized"
+            ${lib.getExe enqueue} ${lib.escapeShellArg mode} "$normalized"
+            rm -f -- "$normalized"
+            trap - EXIT
+            ;;
+          *)
+            echo "ERROR: Unsupported document format: ''${CONTENT_TYPE:-missing}" >&2
+            exit 1
+            ;;
+        esac
+      '';
+    };
+
+  normalizeArchive = normalizeAndEnqueue "archive";
+  normalizePrintArchive = normalizeAndEnqueue "print-and-archive";
+
   saveCommand = pkgs.writeShellApplication {
     name = "paperless-save-command";
     text = ''
-      exec ${lib.getExe enqueue} archive "$@"
+      exec ${lib.getExe normalizeArchive} "$@"
     '';
   };
 
   printSaveCommand = pkgs.writeShellApplication {
     name = "paperless-print-save-command";
     text = ''
-      exec ${lib.getExe enqueue} print-and-archive "$@"
+      exec ${lib.getExe normalizePrintArchive} "$@"
     '';
   };
 
@@ -269,12 +323,17 @@ in
               <service>
                 <type>_ipp._tcp</type>
                 <subtype>_print._sub._ipp._tcp</subtype>
+                <subtype>_universal._sub._ipp._tcp</subtype>
                 <port>${toString cfg.savePort}</port>
                 <txt-record>rp=ipp/print</txt-record>
                 <txt-record>ty=Paperless PDF Archive</txt-record>
-                <txt-record>pdl=application/pdf</txt-record>
+                <txt-record>pdl=image/urf,image/jpeg,application/pdf</txt-record>
+                <txt-record>URF=CP1,IS1-4-5-7-19,MT1-2-3-4-5-6-8-9-10-11-12-13,RS600,SRGB24,V1.4,W8,DM3</txt-record>
                 <txt-record>Color=T</txt-record>
                 <txt-record>Duplex=T</txt-record>
+                <txt-record>Copies=T</txt-record>
+                <txt-record>air=none</txt-record>
+                <txt-record>kind=document</txt-record>
                 <txt-record>UUID=7c5cd48e-98be-4da2-95a7-a9c5f701215f</txt-record>
                 <txt-record>txtvers=1</txt-record>
                 <txt-record>qtotal=1</txt-record>
@@ -289,12 +348,17 @@ in
               <service>
                 <type>_ipp._tcp</type>
                 <subtype>_print._sub._ipp._tcp</subtype>
+                <subtype>_universal._sub._ipp._tcp</subtype>
                 <port>${toString cfg.printSavePort}</port>
                 <txt-record>rp=ipp/print</txt-record>
                 <txt-record>ty=Epson ET-4950 and Paperless Archive</txt-record>
-                <txt-record>pdl=application/pdf</txt-record>
+                <txt-record>pdl=image/urf,image/jpeg,application/pdf</txt-record>
+                <txt-record>URF=CP1,IS1-4-5-7-19,MT1-2-3-4-5-6-8-9-10-11-12-13,RS600,SRGB24,V1.4,W8,DM3</txt-record>
                 <txt-record>Color=T</txt-record>
                 <txt-record>Duplex=T</txt-record>
+                <txt-record>Copies=T</txt-record>
+                <txt-record>air=none</txt-record>
+                <txt-record>kind=document</txt-record>
                 <txt-record>UUID=c3ec9d81-2a53-413b-a6b7-553ffb62f0d6</txt-record>
                 <txt-record>txtvers=1</txt-record>
                 <txt-record>qtotal=1</txt-record>
@@ -376,14 +440,18 @@ in
           wantedBy = [ "multi-user.target" ];
           after = [
             "avahi-daemon.service"
+            "cups.service"
             "systemd-tmpfiles-setup.service"
           ];
-          wants = [ "avahi-daemon.service" ];
+          wants = [
+            "avahi-daemon.service"
+            "cups.service"
+          ];
           serviceConfig = {
             User = serviceUser;
             Group = serviceUser;
             WorkingDirectory = root;
-            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -r off -f application/pdf -F application/pdf -c ${lib.getExe saveCommand} -d ${saveSpool} -p ${toString cfg.savePort} -s 13,7 ${lib.escapeShellArg "Save to Paperless"}";
+            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -r off -f application/pdf,image/urf,image/jpeg -F application/pdf -c ${lib.getExe saveCommand} -d ${saveSpool} -p ${toString cfg.savePort} -s 13,7 ${lib.escapeShellArg "Save to Paperless"}";
             Restart = "on-failure";
             UMask = "0077";
             NoNewPrivileges = true;
@@ -399,14 +467,18 @@ in
           wantedBy = [ "multi-user.target" ];
           after = [
             "avahi-daemon.service"
+            "cups.service"
             "systemd-tmpfiles-setup.service"
           ];
-          wants = [ "avahi-daemon.service" ];
+          wants = [
+            "avahi-daemon.service"
+            "cups.service"
+          ];
           serviceConfig = {
             User = serviceUser;
             Group = serviceUser;
             WorkingDirectory = root;
-            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -r off -f application/pdf -F application/pdf -c ${lib.getExe printSaveCommand} -d ${printSaveSpool} -p ${toString cfg.printSavePort} -s 13,7 ${lib.escapeShellArg "Print and Save to Paperless"}";
+            ExecStart = "${pkgs.cups}/bin/ippeveprinter -2 -r off -f application/pdf,image/urf,image/jpeg -F application/pdf -c ${lib.getExe printSaveCommand} -d ${printSaveSpool} -p ${toString cfg.printSavePort} -s 13,7 ${lib.escapeShellArg "Print and Save to Paperless"}";
             Restart = "on-failure";
             UMask = "0077";
             NoNewPrivileges = true;

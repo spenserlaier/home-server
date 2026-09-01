@@ -1,6 +1,6 @@
 # Paperless logical printers
 
-The home server exposes two LAN-only, driverless IPP destinations:
+The home server exposes two LAN-only, driverless IPP/AirPrint destinations:
 
 ```text
 Save to Paperless            -> Paperless consumption directory
@@ -14,7 +14,9 @@ printers for archival workflows.
 
 ## Delivery model
 
-Each accepted PDF is validated, limited to 100 MiB, and durably staged below:
+Each submitted PDF, Apple Raster (URF), or JPEG is limited to 100 MiB. Raster
+and JPEG jobs are normalized to PDF with the pinned CUPS filters, then the
+resulting PDF is validated, limited to 100 MiB, and durably staged below:
 
 ```text
 /srv/paperless-printer/jobs
@@ -53,7 +55,10 @@ that LAN is the authorization boundary.
 The IPP processes have their built-in DNS-SD publisher disabled. CUPS 2.4.19's
 legacy Avahi integration can abort inside `avahi_entry_group_commit`; keeping
 advertisement in the system Avahi daemon avoids that failure and gives the
-service records a single owner.
+service records a single owner. Each record has both the IPP Everywhere
+`_print` subtype and AirPrint `_universal` subtype. The advertised PDF, Apple
+Raster, and JPEG formats match the IPP endpoint; non-PDF input is converted
+before it crosses the durable job boundary.
 
 ## Deployment and acceptance
 
@@ -74,8 +79,10 @@ lpoptions -p Epson_ET_4950 -l
 ss -lntup | grep -E ':(631|5353|8631|8632)\b'
 ```
 
-From a household client, allow discovery a few seconds to populate the printer
-list. If discovery is unavailable, add the applicable IPP URL above manually.
+From a household client, including an iPhone or iPad, allow discovery a few
+seconds to populate the printer list. Desktop clients can use the applicable
+IPP URL above manually if discovery is unavailable; iOS and iPadOS use
+AirPrint discovery.
 
 Acceptance should use disposable one-page PDFs in this order:
 
@@ -88,6 +95,11 @@ Acceptance should use disposable one-page PDFs in this order:
 4. Stop the Paperless consumer, submit another print-and-save job, and confirm
    the physical job prints while the PDF waits in `/srv/paperless/consume`.
 5. Exercise simplex/duplex, monochrome/color, multiple copies, and Letter media.
+
+For AirPrint acceptance, submit one job from an iPhone or iPad to each logical
+printer and confirm the same exactly-once outcomes. Inspect the resulting
+Paperless document to verify that Apple Raster normalization preserved page
+size, orientation, color, and content.
 
 Inspect failures and queued state with:
 
