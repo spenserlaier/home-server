@@ -87,6 +87,12 @@ Sign out of the administrator account and verify that `household` can:
 4. Create and then revoke a share link.
 5. Not delete a document or access administrative settings.
 
+## Calendar household account
+
+Radicale uses a separate `household` login shared by all family devices.
+Everyone has equal calendar access. Use its distinct SOPS-managed password;
+see [calendar.md](calendar.md) for setup, sync expectations, and recovery.
+
 ## Share-link policy
 
 Paperless share links are bearer credentials: anyone who can reach Paperless

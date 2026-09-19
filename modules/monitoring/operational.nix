@@ -175,6 +175,8 @@ let
     "paperless-printer-dispatch"
     "paperless-print-save-printer"
     "paperless-save-printer"
+    "radicale"
+    "radicale-backup"
     "pihole-dns-check"
     "podman-pihole"
   ];

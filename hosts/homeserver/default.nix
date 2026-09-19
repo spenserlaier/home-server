@@ -21,6 +21,7 @@
     ../../modules/services/paperless.nix
     ../../modules/services/paperless-printer.nix
     ../../modules/services/paperless-scanner.nix
+    ../../modules/services/radicale.nix
     ../../modules/services/pihole.nix
   ]
   # Generate this file on the physical machine before its first install. A
@@ -65,6 +66,7 @@
         "homebox-backup.service"
         "jellyfin-backup.service"
         "paperless-exporter.service"
+        "radicale-backup.service"
         "invoiceshelf-backup.service"
       ];
     };

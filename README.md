@@ -35,6 +35,9 @@ The household portal, non-administrator application accounts, sharing policy,
 and guest-network acceptance checks are documented in
 [docs/household-access.md](./docs/household-access.md).
 
+Household calendar setup, device onboarding, and restoration are documented in
+[docs/calendar.md](./docs/calendar.md).
+
 ## Current scope
 
 This repository implements and validates the platform through the InvoiceShelf
@@ -56,6 +59,7 @@ migration (Phase 7):
 - durable local alerts with LAN-only ntfy push delivery and hosted
   Healthchecks.io dead-man monitoring
 - a declarative Pi-hole resolver ready for staged test-client migration
+- a Radicale family calendar with a shared household login
 - a private household portal at `home.hyrax.fyi`
 
 InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent
