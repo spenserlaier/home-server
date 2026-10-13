@@ -151,6 +151,32 @@ let
     '';
   };
 
+  archiveFilename = pkgs.writeText "paperless-print-filename.py" ''
+    import json
+    import re
+    import sys
+    import unicodedata
+
+    with open(sys.argv[1], encoding="utf-8") as metadata:
+        title = json.load(metadata).get("title") or ""
+    if not isinstance(title, str):
+        title = ""
+    # The client supplies a title, never a path. Keep Unicode text while removing
+    # path separators and control characters (including directional overrides).
+    title = "".join(
+        " " if character in "/\\" or unicodedata.category(character).startswith("C") else character
+        for character in title
+    )
+    title = " ".join(title.split())
+    title = re.sub(r"(?i)\.pdf$", "", title).strip(" .")
+    # Paperless titles are at most 127 characters; Linux filenames have a byte
+    # limit as well. Decode only complete UTF-8 characters after truncation.
+    title = title[:127].encode("utf-8")[:240].decode("utf-8", errors="ignore").rstrip(" .")
+    if not title:
+        title = "virtual-printer-" + sys.argv[2]
+    print(title + ".pdf")
+  '';
+
   dispatch = pkgs.writeShellApplication {
     name = "dispatch-paperless-print-jobs";
     runtimeInputs = with pkgs; [
@@ -158,6 +184,7 @@ let
       cups
       findutils
       jq
+      python3
     ];
     text = ''
       shopt -s nullglob
@@ -173,14 +200,17 @@ let
         job_id="$(basename -- "$job")"
 
         if [[ -e "$job/archive.pending" && ! -e "$job/archive.dispatching" ]]; then
+          filename="$(python3 ${archiveFilename} "$metadata" "$job_id")"
           # A dispatching marker deliberately survives interruption. Automatically
           # retrying an ambiguous handoff could ingest the same document twice.
           touch "$job/archive.dispatching"
-          target="${consumptionDir}/virtual-printer-$job_id.pdf"
+          destination="${consumptionDir}/virtual-printer-$job_id"
+          target="$destination/$filename"
           if [[ -e "$target" || -L "$target" ]]; then
             echo "Paperless target already exists for job $job_id" >&2
           else
-            temporary="${consumptionDir}/.virtual-printer-$job_id.tmp"
+            install -d -o paperless -g paperless -m 0700 -- "$destination"
+            temporary="$destination/.document.tmp"
             install -o paperless -g paperless -m 0600 -- "$document" "$temporary"
             mv --no-target-directory -- "$temporary" "$target"
             rm "$job/archive.pending"
@@ -219,6 +249,11 @@ let
           fi
         fi
       done
+
+      # Paperless removes consumed files, but leaves their per-job directories.
+      # Directory deletion succeeds only while empty, preserving waiting files.
+      find ${lib.escapeShellArg consumptionDir} -mindepth 1 -maxdepth 1 \
+        -type d -name 'virtual-printer-*' -mtime +7 -empty -delete
 
       # Completed payloads are transient; Paperless and CUPS own the durable results.
       # $job expands in the nested Bash process.
@@ -299,6 +334,12 @@ in
     };
 
     services = {
+      paperless.settings = {
+        PAPERLESS_CONSUMER_RECURSIVE = true;
+        # Polling also discovers files when a new job directory is populated
+        # before inotify has installed its recursive watch.
+        PAPERLESS_CONSUMER_POLLING = 5;
+      };
       printing = {
         enable = true;
         startWhenNeeded = false;

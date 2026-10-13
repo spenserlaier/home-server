@@ -25,8 +25,18 @@ resulting PDF is validated, limited to 100 MiB, and durably staged below:
 The IPP request succeeds only after the job directory is atomically published.
 A timer dispatches the archive and physical branches separately every 15
 seconds. Paperless receives a `0600`, `paperless:paperless` PDF through an
-atomic rename into `/srv/paperless/consume`. Physical jobs are submitted to the
-`Epson_ET_4950` CUPS queue.
+atomic rename into `/srv/paperless/consume/virtual-printer-<job UUID>/`.
+Physical jobs are submitted to the `Epson_ET_4950` CUPS queue.
+
+The PDF filename, and therefore Paperless's default document title, comes from
+the client's print-job title. A trailing `.pdf` is removed before appending the
+PDF extension; path separators and control characters become spaces. Titles
+are limited to 127 characters and 240 UTF-8 bytes. Missing or unusable titles
+fall back to `virtual-printer-<job UUID>`. The UUID stays in the parent directory
+so identically titled jobs cannot overwrite each other. Paperless recursively
+polls the consumption directory every five seconds to discover these files.
+Empty job directories are removed after seven days. Existing documents retain
+their titles; this behavior applies to new submissions.
 
 An interrupted dispatch retains a `*.dispatching` marker for manual review.
 The service intentionally does not retry an ambiguous operation because doing
@@ -100,6 +110,10 @@ For AirPrint acceptance, submit one job from an iPhone or iPad to each logical
 printer and confirm the same exactly-once outcomes. Inspect the resulting
 Paperless document to verify that Apple Raster normalization preserved page
 size, orientation, color, and content.
+
+Verify that the new Paperless document title matches the print-job title supplied
+by the sending app. Use different document contents when testing repeated titles:
+Paperless rejects identical PDFs as duplicates, regardless of their filenames.
 
 Inspect failures and queued state with:
 
