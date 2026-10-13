@@ -34,6 +34,10 @@ Use these defaults unless a service has a documented reason to differ:
   application-consistent artifacts below `/srv/backups` are captured.
 - `/srv` itself: `0755 root:root`; service accounts cannot create arbitrary
   top-level directories.
+- Printer maintenance bookkeeping lives in `/srv/printer-maintenance`, mode
+  `0700`, owned by `printer-maintenance:printer-maintenance`. It is excluded
+  from Kopia; preserve its outstanding-job token during routine rebuilds.
+  See [printer-maintenance.md](./printer-maintenance.md) before resetting it.
 
 Avoid recursive ownership changes during routine activation. A service module
 should declare exact paths and modes using systemd tmpfiles or an appropriate

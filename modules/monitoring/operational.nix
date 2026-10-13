@@ -179,7 +179,8 @@ let
     "radicale-backup"
     "pihole-dns-check"
     "podman-pihole"
-  ];
+  ]
+  ++ lib.optional config.homelab.printerMaintenance.enable "printer-maintenance";
 in
 {
   options.homelab.monitoring.alertDeliveryCommand = lib.mkOption {

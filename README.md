@@ -21,6 +21,8 @@ Paperless deployment, persistence, exports, and initial verification are
 documented in [docs/paperless.md](./docs/paperless.md).
 The IPP print-and-archive queues are documented in
 [docs/paperless-printer.md](./docs/paperless-printer.md).
+Inactivity-aware Epson color exercise printing is documented in
+[docs/printer-maintenance.md](./docs/printer-maintenance.md).
 Brother scanner SFTP ingestion and verification are documented in
 [docs/paperless-scanner.md](./docs/paperless-scanner.md).
 InvoiceShelf deployment, persistence, backup, and initial verification are

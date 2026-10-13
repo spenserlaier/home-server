@@ -20,6 +20,7 @@
     ../../modules/services/jellyfin.nix
     ../../modules/services/paperless.nix
     ../../modules/services/paperless-printer.nix
+    ../../modules/services/printer-maintenance.nix
     ../../modules/services/paperless-scanner.nix
     ../../modules/services/radicale.nix
     ../../modules/services/pihole.nix
@@ -49,6 +50,8 @@
     enable = true;
     printerAddress = "192.168.4.21";
   };
+
+  homelab.printerMaintenance.enable = true;
 
   homelab.backup = {
     jellyfin = {
