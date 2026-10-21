@@ -8,9 +8,9 @@ https://home.hyrax.fyi
 
 The portal links to all household web applications: Jellyfin, Audiobookshelf,
 Paperless, Homebox, and InvoiceShelf. A visually separate **Administration**
-section links to Pi-hole and ntfy without presenting them as everyday household
-tools. Caddy's health endpoint is omitted because it is a diagnostic response,
-not an application interface. Application passwords are never embedded in the
+section links to Kopia backups, Pi-hole, and ntfy without presenting them as
+everyday household tools. Caddy's health endpoint is omitted because it is a
+diagnostic response, not an application interface. Application passwords are never embedded in the
 portal.
 
 The grouping is informational rather than an authorization boundary. Every

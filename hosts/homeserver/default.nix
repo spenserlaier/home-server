@@ -10,6 +10,7 @@
     ../../modules/base/users.nix
     ../../modules/backup/jellyfin-native.nix
     ../../modules/backup/kopia.nix
+    ../../modules/backup/kopia-ui.nix
     ../../modules/monitoring/notifications.nix
     ../../modules/monitoring/operational.nix
     ../../modules/networking/reverse-proxy.nix
@@ -61,6 +62,7 @@
     };
     kopia = {
       enable = true;
+      ui.enable = true;
       bucket = "hyrax-home-server";
       endpoint = "s3.us-east-005.backblazeb2.com";
       region = "us-east-005";

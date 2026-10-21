@@ -10,6 +10,61 @@ contents are encrypted by Kopia before upload. Backblaze's bucket encryption is
 an additional storage-side layer, not a replacement for the repository
 password.
 
+## Backup browser
+
+Open **Backups** in the dashboard's **Administration** section, or visit
+`https://backups.home.hyrax.fyi`. Sign in as `admin` using the distinct
+`kopia/ui_password` secret in SOPS. Retrieve it on the administrative laptop:
+
+```console
+sops decrypt --extract '["kopia"]["ui_password"]' secrets/homeserver.yaml
+```
+
+Show snapshots from all users/hosts if needed to find `root@homeserver:/srv/backups`,
+then choose a snapshot and browse `services/<service>`. Individual
+files can be downloaded to your browser. ZIP and compressed TAR artifacts must
+be downloaded or restored before inspecting their contents; Kopia does not
+browse inside application archives.
+
+The UI connects to the existing B2 repository read-only and refreshes repository
+status every five minutes. Backup creation, retention, and verification remain
+owned by the existing systemd jobs. Mutation controls may still be visible in
+Kopia, but repository writes are rejected. The UI login grants access to all
+decrypted service backups; it is an administrative account.
+
+For server-side restores, select a **new** destination beneath
+`/srv/kopia-ui/restores`, such as `/srv/kopia-ui/restores/2026-10-20-paperless`.
+Disable **Restore File Ownership** when restoring through the UI: the service
+runs unprivileged and cannot reproduce the original root-owned files' owners.
+These files belong to `kopia-ui` and require administrator access outside the UI.
+The dedicated service identity and filesystem sandbox prevent restoring over
+live application data. Repository read-only access does not prevent writing
+restored files locally. The cache, runtime connection, and restore workspace
+are excluded from backups and are not needed for disaster recovery. Remove
+unneeded restored files after inspection; the workspace has no automatic cleanup.
+Application-level validation and recovery still follow the procedures below.
+
+The backend listens only on `127.0.0.1:51515`; Caddy provides private HTTPS and
+Kopia requires authentication. Pi-hole declares the `backups` DNS record. On a
+client using a different resolver, add the same private record there.
+
+After deployment, verify:
+
+```console
+sudo systemctl status kopia-ui.service
+sudo journalctl --unit kopia-ui.service --since today
+dig @192.168.4.22 backups.home.hyrax.fyi A
+curl --silent --output /dev/null --write-out '%{http_code}\n' \
+  https://backups.home.hyrax.fyi/api/v1/snapshots
+```
+
+DNS must return `192.168.4.22`, and the anonymous API request must return `401`.
+Sign in, browse a historical snapshot, download a small artifact, and restore a
+service subtree to a new workspace directory. Confirm that the repository is
+read-only and the existing Kopia backup and verification timers remain active.
+If the bucket has not been initialized, the UI retries its connection every
+30 seconds; initialize it using the explicit procedure below.
+
 ## Retention model
 
 Kopia applies a 30-day compliance Object Lock to every repository blob. Object

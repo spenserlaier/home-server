@@ -98,6 +98,7 @@ their consumers are unambiguous, for example:
 ```yaml
 kopia:
   repository_password: replace-me
+  ui_password: generated-random-password
   b2_key_id: replace-me
   b2_application_key: replace-me
 paperless:

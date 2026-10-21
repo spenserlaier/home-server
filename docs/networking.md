@@ -46,14 +46,16 @@ default site. Requests over HTTP redirect to HTTPS.
 
 ## Household portal
 
-The static household portal is available at:
+The household portal is available at:
 
 ```text
 https://home.hyrax.fyi
 ```
 
-It links only to household-facing services. It contains no application
-credentials, administrative links, live service data, or third-party assets.
+It links to household-facing services and a separate Administration section
+with Kopia backups, Pi-hole, and server alerts. Each application requires its
+own authentication. It contains no application credentials, live service data,
+or third-party assets.
 Its availability message describes network scope and is not a live health
 indicator; operational monitoring remains responsible for failure detection.
 

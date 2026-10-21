@@ -22,6 +22,10 @@ service account and group that own them.
 Use these defaults unless a service has a documented reason to differ:
 
 - Service-private state: `0750`, owned by the service user and group.
+- Kopia UI restores: `/srv/kopia-ui/restores`, `0700`, owned by `kopia-ui`.
+  This is a disposable inspection workspace, excluded from backups. Repository
+  configuration is regenerated under `/run/kopia-ui`; cache and logs live under
+  `/var/cache/kopia-ui` and can be rebuilt from B2.
 - Secret-bearing directories: `0700`, owned by the consuming service user.
 - Shared read-only data: `0750`, with a narrowly scoped shared group.
 - Deliberate LAN-facing drop directories: isolate them from application state,
