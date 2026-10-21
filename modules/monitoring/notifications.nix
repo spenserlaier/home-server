@@ -194,12 +194,10 @@ let
         [[ "$required" == "required" ]] && exit 1 || exit 0
       }
 
-      config_file="$(mktemp --tmpdir=/run homelab-healthchecks-ping.XXXXXX)"
-      trap 'rm -f -- "$config_file"' EXIT
-      chmod 0600 "$config_file"
-      printf 'url = "%s%s"\n' "$url" "$suffix" >"$config_file"
-      unset url
-      if curl --config "$config_file" --fail --silent --show-error \
+      # Pass the private URL on stdin: Kopia's ProtectSystem=strict sandbox
+      # makes /run read-only outside its dedicated RuntimeDirectory.
+      if printf 'url = "%s%s"\n' "$url" "$suffix" | curl \
+        --config - --fail --silent --show-error \
         --max-time 15 --request POST; then
         exit 0
       fi

@@ -101,6 +101,13 @@ into a failed backup job. The required heartbeat does fail locally when it
 cannot reach Healthchecks, producing a durable ntfy-visible alert while the
 external heartbeat independently approaches its deadline.
 
+Healthchecks hooks pass their private ping URL to curl through stdin. They do
+not create temporary files under `/run`, which is read-only inside the Kopia
+backup sandbox outside its dedicated runtime directory. A failed optional ping
+must not prevent the backup from running or mark an uploaded backup as failed.
+Kopia's sandbox grants its post-backup hooks write access to the alert directory
+and backup success marker directory; verification can update only the alerts.
+
 ## Checks
 
 `homelab-disk-space-check.timer` runs daily and fails at 80% usage. All current

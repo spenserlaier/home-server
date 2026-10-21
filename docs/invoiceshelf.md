@@ -27,8 +27,11 @@ These bind mounts are the only application state retained across container
 recreation. Container layers are disposable. Do not copy source code, caches,
 or generated frontend bundles from the old Invoice Ninja installation into
 these paths. The application image runs as numeric uid/gid 82, so the module
-declaratively assigns both `storage` and `modules` to `82:82`; the database
-container manages ownership of its own data directory. The module also creates
+declaratively assigns both `storage` and `modules` to `82:82`. The database
+mount root is `0700`, owned by `999:999`, matching the pinned MariaDB image's
+`mysql` user. Tmpfiles reapplies that ownership without recursively changing
+database contents; assigning the mount root to `root:root` prevents database
+reads and blocks backups after a rebuild. The module also creates
 `storage/app/templates/pdf`, which InvoiceShelf requires while caching views
 but its container entrypoint does not create on a fresh bind mount.
 

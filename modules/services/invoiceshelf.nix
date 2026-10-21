@@ -298,7 +298,9 @@ in
       "d ${storageDir}/app/templates 0750 82 82 - -"
       "d ${storageDir}/app/templates/pdf 0750 82 82 - -"
       "d ${modulesDir} 0750 82 82 - -"
-      "d ${databaseDir} 0700 root root - -"
+      # The pinned MariaDB image runs mysqld as mysql (uid/gid 999).
+      # Reapplying tmpfiles must not take its bind mount back from that user.
+      "d ${databaseDir} 0700 999 999 - -"
       "d ${exportDir} 0700 root root - -"
     ];
 

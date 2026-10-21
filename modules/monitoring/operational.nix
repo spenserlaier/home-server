@@ -285,6 +285,14 @@ in
     {
       systemd.services = lib.genAttrs monitoredUnits (name: {
         unitConfig.OnFailure = [ "homelab-unit-failure@%n.service" ];
+        # Kopia's strict filesystem sandbox also applies to ExecStartPost.
+        # Permit only the monitoring state its success hooks must update.
+        serviceConfig.ReadWritePaths =
+          lib.optionals (builtins.elem name [
+            "kopia-backup"
+            "kopia-verify"
+          ]) [ alertStateDir ]
+          ++ lib.optional (name == "kopia-backup") monitoringStateDir;
         serviceConfig.ExecStartPost = [
           "+${lib.getExe clearAlert} unit-${name}.service"
         ]
