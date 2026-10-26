@@ -44,6 +44,13 @@ curl --fail https://caddy.home.hyrax.fyi/healthz
 The response must be `ok`. Other paths are aborted rather than serving a
 default site. Requests over HTTP redirect to HTTPS.
 
+## Personal notes trial
+
+Trilium's personal notes trial uses `https://notes.home.hyrax.fyi`, with a
+Pi-hole private A record and a loopback backend on port 8093. Its browser,
+desktop sync, ETAPI, and optional MCP all use that same HTTPS origin. As with
+other services, remote clients need the planned VPN and private DNS routing.
+
 ## Household portal
 
 The household portal is available at:

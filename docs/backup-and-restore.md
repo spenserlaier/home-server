@@ -5,6 +5,12 @@ captures that entire staging tree as one encrypted Kopia snapshot in the
 dedicated `hyrax-home-server` Backblaze bucket. The Git repository reconstructs
 the operating system; Kopia reconstructs service data.
 
+The Trilium trial adds `trilium-backup.service` to the required producers. It
+publishes validated SQLite database generations (including revisions and
+attachments) under `services/trilium`. Initialize the trial before its first
+scheduled backup; the producer rejects an uninitialized database. See
+[trilium.md](./trilium.md) for two-laptop acceptance and isolated recovery.
+
 Kopia uses Backblaze's S3-compatible endpoint in `us-east-005`. Repository
 contents are encrypted by Kopia before upload. Backblaze's bucket encryption is
 an additional storage-side layer, not a replacement for the repository

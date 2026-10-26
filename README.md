@@ -17,6 +17,8 @@ Audiobookshelf deployment, library layout, backup, and verification are
 documented in [docs/audiobookshelf.md](./docs/audiobookshelf.md).
 Homebox deployment, owner bootstrap, backup, and verification are documented in
 [docs/homebox.md](./docs/homebox.md).
+The Trilium notes trial, two-laptop setup, MCP, revision recovery checks, and
+backups are documented in [docs/trilium.md](./docs/trilium.md).
 Paperless deployment, persistence, exports, and initial verification are
 documented in [docs/paperless.md](./docs/paperless.md).
 The IPP print-and-archive queues are documented in
@@ -62,6 +64,7 @@ migration (Phase 7):
   Healthchecks.io dead-man monitoring
 - a declarative Pi-hole resolver ready for staged test-client migration
 - a Radicale family calendar with a shared household login
+- a TriliumNext 0.106.1 trial with private HTTPS and validated SQLite backups
 - a private household portal at `home.hyrax.fyi`
 
 InvoiceShelf has passed customer/invoice/PDF generation, persistence, coherent

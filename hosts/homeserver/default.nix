@@ -25,6 +25,7 @@
     ../../modules/services/paperless-scanner.nix
     ../../modules/services/radicale.nix
     ../../modules/services/pihole.nix
+    ../../modules/services/trilium.nix
   ]
   # Generate this file on the physical machine before its first install. A
   # conditional import keeps remote evaluation possible until then.
@@ -73,6 +74,7 @@
         "paperless-exporter.service"
         "radicale-backup.service"
         "invoiceshelf-backup.service"
+        "trilium-backup.service"
       ];
     };
   };

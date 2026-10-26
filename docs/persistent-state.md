@@ -36,6 +36,10 @@ Use these defaults unless a service has a documented reason to differ:
 - Logical printer jobs use `/srv/paperless-printer/jobs` as a private durable
   outbox. These payloads are transient and excluded from Kopia because only the
   application-consistent artifacts below `/srv/backups` are captured.
+- Trilium owns `/srv/trilium` as `trilium:trilium`, mode `0750`. Its database
+  contains notes, revisions, attachments, and authentication state. The online
+  backup producer publishes validated SQLite generations beneath
+  `/srv/backups/services/trilium`; see [trilium.md](./trilium.md).
 - `/srv` itself: `0755 root:root`; service accounts cannot create arbitrary
   top-level directories.
 - Printer maintenance bookkeeping lives in `/srv/printer-maintenance`, mode

@@ -177,6 +177,8 @@ let
     "paperless-save-printer"
     "radicale"
     "radicale-backup"
+    "trilium-server"
+    "trilium-backup"
     "pihole-dns-check"
     "podman-pihole"
   ]
