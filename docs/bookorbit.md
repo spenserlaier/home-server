@@ -33,7 +33,7 @@ Upstream references:
 | --- | --- |
 | `/srv/bookorbit` | Service root, `root:root 0750` |
 | `/srv/bookorbit/data` | Covers and app-managed files, `bookorbit:bookorbit 0750` |
-| `/srv/bookorbit/database` | PostgreSQL bind-mount root, `root:root 0700`; the image owns/initializes its `pgdata` child |
+| `/srv/bookorbit/database` | PostgreSQL bind-mount root, `999:999 0700`; mounted at `/var/lib/postgresql`, with image-managed PGDATA in `18/docker` |
 | `/srv/media/books` | Empty source library, `root:bookorbit 2770`; mounted at `/books` read-only |
 | `/srv/backups/services/bookorbit` | Validated backup generations, `root:homelab-backup 0750` |
 

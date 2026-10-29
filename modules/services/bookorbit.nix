@@ -166,10 +166,12 @@ in
           environment = {
             POSTGRES_USER = "bookorbit";
             POSTGRES_DB = "bookorbit";
-            PGDATA = "/var/lib/postgresql/data/pgdata";
+            PGDATA = "/var/lib/postgresql/18/docker";
           };
           environmentFiles = [ config.sops.templates."bookorbit-database.env".path ];
-          volumes = [ "${databaseDir}:/var/lib/postgresql/data" ];
+          # PostgreSQL 18 declares this parent as its image volume. Mounting
+          # only its data/ child leaves an overlapping anonymous volume.
+          volumes = [ "${databaseDir}:/var/lib/postgresql" ];
           extraOptions = [ "--network=${networkName}" ];
         };
         ${appContainer} = {
@@ -259,8 +261,9 @@ in
       "d ${stateRoot} 0750 root root - -"
       "d ${dataDir} 0750 bookorbit bookorbit - -"
       "d ${booksDir} 2770 root bookorbit - -"
-      # The upstream PostgreSQL image initializes/chowns its own PGDATA child.
-      "d ${databaseDir} 0700 root root - -"
+      # The image drops to postgres (999:999), which must also be able to
+      # traverse the mount root above its versioned PGDATA directory.
+      "d ${databaseDir} 0700 999 999 - -"
       "d ${backupDir} 0750 root homelab-backup - -"
     ];
     services = {

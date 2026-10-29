@@ -44,8 +44,10 @@ Use these defaults unless a service has a documented reason to differ:
   top-level directories.
 - BookOrbit owns `/srv/bookorbit/data` as `bookorbit:bookorbit` (UID/GID 1200),
   mode `0750`. Its isolated pgvector/PostgreSQL container initializes PGDATA
-  beneath `/srv/bookorbit/database`; the mount root is `0700 root:root` and
-  PostgreSQL owns the child. `/srv/media/books` is `2770 root:bookorbit`, mounted
+  beneath `/srv/bookorbit/database`; the mount root is `0700 999:999` and
+  PostgreSQL owns the `18/docker` child (the bind mount targets
+  `/var/lib/postgresql`, matching the PostgreSQL 18 image volume).
+  `/srv/media/books` is `2770 root:bookorbit`, mounted
   read-only into the app. Database, application data, and source books are
   exported together beneath `/srv/backups/services/bookorbit`. See
   [bookorbit.md](./bookorbit.md) for setup and recovery. No books are imported yet.
