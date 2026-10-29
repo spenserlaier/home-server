@@ -7,7 +7,9 @@ https://home.hyrax.fyi
 ```
 
 The portal links to all household web applications: Jellyfin, Audiobookshelf,
-Paperless, Homebox, and InvoiceShelf. A visually separate **Administration**
+Paperless, Homebox, InvoiceShelf, Trilium, and BookOrbit. BookOrbit initially has
+an empty library; see [bookorbit.md](./bookorbit.md) before adding books.
+A visually separate **Administration**
 section links to Kopia backups, Pi-hole, and ntfy without presenting them as
 everyday household tools. Caddy's health endpoint is omitted because it is a
 diagnostic response, not an application interface. Application passwords are never embedded in the

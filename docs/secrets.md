@@ -107,6 +107,11 @@ audiobookshelf:
   admin_password: generated-random-password
 homebox:
   admin_password: generated-random-password
+bookorbit:
+  database_password: independently-generated-hex-secret
+  jwt_secret: independently-generated-hex-secret
+  podcast_encryption_key: independently-generated-hex-secret
+  setup_bootstrap_token: independently-generated-hex-secret
 invoiceshelf:
   app_key: replace-me
   database_password: replace-me

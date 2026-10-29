@@ -15,6 +15,8 @@ Jellyfin deployment, state, media, and verification are documented in
 [docs/jellyfin.md](./docs/jellyfin.md).
 Audiobookshelf deployment, library layout, backup, and verification are
 documented in [docs/audiobookshelf.md](./docs/audiobookshelf.md).
+BookOrbit's initial ebook service, first-run setup, and backups are documented
+in [docs/bookorbit.md](./docs/bookorbit.md); book import remains deferred.
 Homebox deployment, owner bootstrap, backup, and verification are documented in
 [docs/homebox.md](./docs/homebox.md).
 The Trilium notes trial, two-laptop setup, MCP, revision recovery checks, and
@@ -56,6 +58,8 @@ migration (Phase 7):
 - private HTTPS through Caddy and Porkbun DNS-01
 - Jellyfin with hardware transcoding and native backup artifacts
 - Audiobookshelf with a separately managed, read-only audiobook library
+- BookOrbit 3.6.0 with an isolated pgvector database and coherent backups;
+  library import and organization are deferred
 - Homebox household inventory with closed registration and coherent backups
 - Paperless-ngx with PostgreSQL, native exports, and direct scanner ingestion
 - encrypted, immutable off-host Kopia generations in Backblaze B2

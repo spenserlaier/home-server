@@ -162,6 +162,10 @@ let
   };
 
   monitoredUnits = [
+    "bookorbit-network"
+    "bookorbit-backup"
+    "podman-bookorbit"
+    "podman-bookorbit-database"
     "healthchecks-heartbeat"
     "healthchecks-reconcile"
     "invoiceshelf-backup"

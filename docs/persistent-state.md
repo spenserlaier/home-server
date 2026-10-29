@@ -42,6 +42,13 @@ Use these defaults unless a service has a documented reason to differ:
   `/srv/backups/services/trilium`; see [trilium.md](./trilium.md).
 - `/srv` itself: `0755 root:root`; service accounts cannot create arbitrary
   top-level directories.
+- BookOrbit owns `/srv/bookorbit/data` as `bookorbit:bookorbit` (UID/GID 1200),
+  mode `0750`. Its isolated pgvector/PostgreSQL container initializes PGDATA
+  beneath `/srv/bookorbit/database`; the mount root is `0700 root:root` and
+  PostgreSQL owns the child. `/srv/media/books` is `2770 root:bookorbit`, mounted
+  read-only into the app. Database, application data, and source books are
+  exported together beneath `/srv/backups/services/bookorbit`. See
+  [bookorbit.md](./bookorbit.md) for setup and recovery. No books are imported yet.
 - Printer maintenance bookkeeping lives in `/srv/printer-maintenance`, mode
   `0700`, owned by `printer-maintenance:printer-maintenance`. It is excluded
   from Kopia; preserve its outstanding-job token during routine rebuilds.

@@ -15,6 +15,7 @@
     ../../modules/monitoring/operational.nix
     ../../modules/networking/reverse-proxy.nix
     ../../modules/services/audiobookshelf.nix
+    ../../modules/services/bookorbit.nix
     ../../modules/services/homebox.nix
     ../../modules/services/invoiceshelf.nix
     ../../modules/services/home-portal.nix
@@ -69,6 +70,7 @@
       region = "us-east-005";
       prepareUnits = [
         "audiobookshelf-backup.service"
+        "bookorbit-backup.service"
         "homebox-backup.service"
         "jellyfin-backup.service"
         "paperless-exporter.service"

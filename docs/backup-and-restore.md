@@ -5,6 +5,11 @@ captures that entire staging tree as one encrypted Kopia snapshot in the
 dedicated `hyrax-home-server` Backblaze bucket. The Git repository reconstructs
 the operating system; Kopia reconstructs service data.
 
+BookOrbit adds `bookorbit-backup.service` to the required producers. It publishes
+validated PostgreSQL dumps and application/source-file archives under
+`services/bookorbit`. The initial source library is empty; no laptop books are
+imported. See [bookorbit.md](./bookorbit.md) for owner setup and recovery.
+
 The Trilium trial adds `trilium-backup.service` to the required producers. It
 publishes validated SQLite database generations (including revisions and
 attachments) under `services/trilium`. Initialize the trial before its first
